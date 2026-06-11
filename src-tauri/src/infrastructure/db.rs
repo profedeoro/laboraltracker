@@ -91,8 +91,8 @@ mod tests {
     #[test]
     fn db_rejects_second_running_session() {
         let conn = migrated_in_memory();
-        conn.execute("INSERT INTO project(id, name, created_at) VALUES ('p1', 'p', 0)", []).unwrap();
-        conn.execute("INSERT INTO task(id, project_id, name, created_at) VALUES ('t1', 'p1', 't', 0)", []).unwrap();
+        conn.execute("INSERT INTO project(id, name, created_at) VALUES ('p1', 'p', 1700000000000)", []).unwrap();
+        conn.execute("INSERT INTO task(id, project_id, name, created_at) VALUES ('t1', 'p1', 't', 1700000000000)", []).unwrap();
         conn.execute("INSERT INTO time_session(id, task_id, started_at) VALUES ('s1', 't1', 100)", []).unwrap();
         let second = conn.execute("INSERT INTO time_session(id, task_id, started_at) VALUES ('s2', 't1', 200)", []);
         assert!(second.is_err(), "una 2ª sesión abierta debe ser rechazada por el índice único parcial");
@@ -101,8 +101,8 @@ mod tests {
     #[test]
     fn db_rejects_negative_duration() {
         let conn = migrated_in_memory();
-        conn.execute("INSERT INTO project(id, name, created_at) VALUES ('p1', 'p', 0)", []).unwrap();
-        conn.execute("INSERT INTO task(id, project_id, name, created_at) VALUES ('t1', 'p1', 't', 0)", []).unwrap();
+        conn.execute("INSERT INTO project(id, name, created_at) VALUES ('p1', 'p', 1700000000000)", []).unwrap();
+        conn.execute("INSERT INTO task(id, project_id, name, created_at) VALUES ('t1', 'p1', 't', 1700000000000)", []).unwrap();
         let bad = conn.execute(
             "INSERT INTO time_session(id, task_id, started_at, ended_at) VALUES ('s1', 't1', 200, 100)",
             [],
