@@ -34,6 +34,16 @@
   in the Rust domain via the `ulid` crate); schema and Plan 1 updated accordingly. /
   **ADR 0005** (Aceptado): estrategia de IDs local→nube = **PK ULID de texto**
   (generadas en el dominio Rust con el crate `ulid`); esquema y Plan 1 actualizados.
+- **Foundation built & verified end-to-end** (Plan 1): Tauri 2 + Svelte/TS app
+  launches; SQLite (WAL) wired into Tauri state via `Mutex<Connection>`; migration
+  `0001` applied on startup (ULID `TEXT` PKs, partial unique index enforcing one
+  running session, `CHECK` against negative duration); `health` command; 5/5 Rust
+  tests green; 0 warnings. /
+  **Fundación construida y verificada de extremo a extremo** (Plan 1): la app Tauri 2
+  + Svelte/TS arranca; SQLite (WAL) cableado al estado de Tauri vía
+  `Mutex<Connection>`; migración `0001` aplicada al arrancar (PK ULID `TEXT`, índice
+  único parcial que garantiza una sola sesión activa, `CHECK` contra duración
+  negativa); comando `health`; 5/5 tests Rust en verde; 0 warnings.
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
