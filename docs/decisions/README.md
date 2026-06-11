@@ -40,7 +40,7 @@ normalmente se pierde entre las cabezas del equipo y el historial de git.
 | [0002](0002-hexagonal-architecture-solid.md) | Arquitectura hexagonal + SOLID (didáctica) | Accepted |
 | [0003](0003-time-and-schema-foundations.md) | Fundaciones de tiempo y esquema SQLite | Accepted |
 | [0004](0004-docs-conventions-vs-decision-record.md) | Convenciones vs. registro de decisión | Accepted |
-| [0005](0005-id-strategy-local-to-cloud.md) | Estrategia de IDs (local → nube) | Proposed |
+| [0005](0005-id-strategy-local-to-cloud.md) | Estrategia de IDs (local → nube): ULID texto | Accepted |
 
 ## Plantilla / Template
 

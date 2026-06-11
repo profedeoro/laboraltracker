@@ -123,7 +123,10 @@ presentes):
 rusqlite = { version = "0.32.1", features = ["bundled"] }
 rusqlite_migration = "1.3"
 thiserror = "1"
+ulid = "1"
 ```
+> `ulid` genera los IDs de texto en el dominio (ADR 0005). En Plan 1 aún no hay
+> dominio, así que la dependencia se declara aquí pero se usa desde Plan 2.
 Y en una sección nueva `[dev-dependencies]`:
 ```toml
 [dev-dependencies]
@@ -276,7 +279,7 @@ git commit -m "feat(infra): SQLite connection with per-connection pragmas"
 Create `src-tauri/migrations/0001_init.sql`:
 ```sql
 CREATE TABLE project (
-    id          INTEGER PRIMARY KEY,
+    id          TEXT    PRIMARY KEY,
     name        TEXT    NOT NULL CHECK (length(trim(name)) > 0),
     color       TEXT,
     created_at  INTEGER NOT NULL,
@@ -284,8 +287,8 @@ CREATE TABLE project (
 );
 
 CREATE TABLE task (
-    id          INTEGER PRIMARY KEY,
-    project_id  INTEGER NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+    id          TEXT    PRIMARY KEY,
+    project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
     name        TEXT    NOT NULL CHECK (length(trim(name)) > 0),
     created_at  INTEGER NOT NULL,
     completed   INTEGER NOT NULL DEFAULT 0
@@ -293,8 +296,8 @@ CREATE TABLE task (
 CREATE INDEX ix_task_project ON task(project_id);
 
 CREATE TABLE time_session (
-    id                INTEGER PRIMARY KEY,
-    task_id           INTEGER NOT NULL REFERENCES task(id) ON DELETE CASCADE,
+    id                TEXT    PRIMARY KEY,
+    task_id           TEXT    NOT NULL REFERENCES task(id) ON DELETE CASCADE,
     started_at        INTEGER NOT NULL,
     ended_at          INTEGER,
     last_heartbeat_at INTEGER,
@@ -336,20 +339,20 @@ En `db.rs`, dentro de `mod tests`, añade:
     #[test]
     fn db_rejects_second_running_session() {
         let conn = migrated_in_memory();
-        conn.execute("INSERT INTO project(name, created_at) VALUES ('p', 0)", []).unwrap();
-        conn.execute("INSERT INTO task(project_id, name, created_at) VALUES (1, 't', 0)", []).unwrap();
-        conn.execute("INSERT INTO time_session(task_id, started_at) VALUES (1, 100)", []).unwrap();
-        let second = conn.execute("INSERT INTO time_session(task_id, started_at) VALUES (1, 200)", []);
+        conn.execute("INSERT INTO project(id, name, created_at) VALUES ('p1', 'p', 0)", []).unwrap();
+        conn.execute("INSERT INTO task(id, project_id, name, created_at) VALUES ('t1', 'p1', 't', 0)", []).unwrap();
+        conn.execute("INSERT INTO time_session(id, task_id, started_at) VALUES ('s1', 't1', 100)", []).unwrap();
+        let second = conn.execute("INSERT INTO time_session(id, task_id, started_at) VALUES ('s2', 't1', 200)", []);
         assert!(second.is_err(), "una 2ª sesión abierta debe ser rechazada por el índice único parcial");
     }
 
     #[test]
     fn db_rejects_negative_duration() {
         let conn = migrated_in_memory();
-        conn.execute("INSERT INTO project(name, created_at) VALUES ('p', 0)", []).unwrap();
-        conn.execute("INSERT INTO task(project_id, name, created_at) VALUES (1, 't', 0)", []).unwrap();
+        conn.execute("INSERT INTO project(id, name, created_at) VALUES ('p1', 'p', 0)", []).unwrap();
+        conn.execute("INSERT INTO task(id, project_id, name, created_at) VALUES ('t1', 'p1', 't', 0)", []).unwrap();
         let bad = conn.execute(
-            "INSERT INTO time_session(task_id, started_at, ended_at) VALUES (1, 200, 100)",
+            "INSERT INTO time_session(id, task_id, started_at, ended_at) VALUES ('s1', 't1', 200, 100)",
             [],
         );
         assert!(bad.is_err(), "ended_at < started_at debe violar el CHECK");

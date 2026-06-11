@@ -13,9 +13,14 @@
 > migración dentro de una transacción, y SQLite ignora `foreign_keys` en
 > transacción. Poner el PRAGMA aquí sería un no-op silencioso.
 
+> **IDs = ULID en `TEXT`** (ADR [0005](../decisions/0005-id-strategy-local-to-cloud.md)).
+> PK/FK son `TEXT`; el ULID se genera en el **dominio Rust** (crate `ulid`), nunca
+> por la BD. Globalmente único → sin colisión en la sync futura. Por eso **no** se
+> usa `INTEGER PRIMARY KEY` (rowid autoincremental local).
+
 ```sql
 CREATE TABLE project (
-    id          INTEGER PRIMARY KEY,
+    id          TEXT    PRIMARY KEY,            -- ULID generado en dominio
     name        TEXT    NOT NULL CHECK (length(trim(name)) > 0),
     color       TEXT,
     created_at  INTEGER NOT NULL,            -- epoch millis UTC
@@ -23,8 +28,8 @@ CREATE TABLE project (
 );
 
 CREATE TABLE task (
-    id          INTEGER PRIMARY KEY,
-    project_id  INTEGER NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+    id          TEXT    PRIMARY KEY,            -- ULID
+    project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
     name        TEXT    NOT NULL CHECK (length(trim(name)) > 0),
     created_at  INTEGER NOT NULL,
     completed   INTEGER NOT NULL DEFAULT 0
@@ -32,8 +37,8 @@ CREATE TABLE task (
 CREATE INDEX ix_task_project ON task(project_id);
 
 CREATE TABLE time_session (
-    id                INTEGER PRIMARY KEY,
-    task_id           INTEGER NOT NULL REFERENCES task(id) ON DELETE CASCADE,
+    id                TEXT    PRIMARY KEY,       -- ULID
+    task_id           TEXT    NOT NULL REFERENCES task(id) ON DELETE CASCADE,
     started_at        INTEGER NOT NULL,           -- epoch millis UTC
     ended_at          INTEGER,                    -- NULL = corriendo
     last_heartbeat_at INTEGER,                    -- ancla de recuperación

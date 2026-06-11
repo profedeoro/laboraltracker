@@ -30,8 +30,10 @@
 - **Plan 1 (Foundation)** implementation plan (scaffold + SQLite persistence). /
   **Plan 1 (Fundación)**: plan de implementación (scaffold + persistencia SQLite).
   → `docs/superpowers/plans/2026-06-11-laboraltracker-foundation.md`
-- **ADR 0005** (Proposed): local→cloud ID strategy decision surfaced. /
-  **ADR 0005** (Propuesto): se expone la decisión de estrategia de IDs local→nube.
+- **ADR 0005** (Accepted): local→cloud ID strategy = **ULID text PKs** (generated
+  in the Rust domain via the `ulid` crate); schema and Plan 1 updated accordingly. /
+  **ADR 0005** (Aceptado): estrategia de IDs local→nube = **PK ULID de texto**
+  (generadas en el dominio Rust con el crate `ulid`); esquema y Plan 1 actualizados.
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time

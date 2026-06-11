@@ -1,6 +1,6 @@
 # 0005 — Estrategia de IDs (local → nube)
 
-- **Status:** Proposed (requiere decisión del usuario antes de construir Plan 1)
+- **Status:** Accepted (Opción A — ULID texto)
 - **Date:** 2026-06-11
 
 ## 🇬🇧 Context
@@ -46,11 +46,13 @@ que Plan 1 la congele.
   rowid; la sync usa el uuid. Coste medio; dos identidades que mantener coherentes.
 
 ## 🇬🇧 Decision / 🇪🇸 Decisión
-**PENDING — awaiting user.** Recommendation: **A** (ULID text PK), because the
-project's explicit goal is team/cloud and option A removes a known, expensive future
-migration at near-zero cost today. / **PENDIENTE — a la espera del usuario.**
-Recomendación: **A** (PK ULID de texto), porque la meta declarada es equipo/nube y la
-opción A elimina una migración futura conocida y cara a coste casi nulo hoy.
+**Option A — ULID text PK.** PKs are `TEXT` holding a ULID generated in the Rust
+domain via the `ulid` crate; foreign keys are `TEXT`. Chosen because the project's
+explicit goal is team/cloud and A removes a known, expensive future ID-remapping
+migration at near-zero cost today. / **Opción A — PK ULID de texto.** Las PK son
+`TEXT` con un ULID generado en el dominio Rust con el crate `ulid`; las claves
+foráneas son `TEXT`. Elegida porque la meta declarada es equipo/nube y A elimina una
+migración futura de remapeo, conocida y cara, a coste casi nulo hoy.
 
 ## 🇬🇧 Consequences / 🇪🇸 Consecuencias
 - If A: update `05-data-schema.md` (PKs → `TEXT`, IDs generated in domain via `ulid`),
