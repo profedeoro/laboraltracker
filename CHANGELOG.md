@@ -27,6 +27,11 @@
   **Carpeta de ADRs** con registros retroactivos 0001–0004 (bilingüe).
   → `docs/decisions/`
 - **This bilingual CHANGELOG.** / **Este CHANGELOG bilingüe.**
+- **Plan 1 (Foundation)** implementation plan (scaffold + SQLite persistence). /
+  **Plan 1 (Fundación)**: plan de implementación (scaffold + persistencia SQLite).
+  → `docs/superpowers/plans/2026-06-11-laboraltracker-foundation.md`
+- **ADR 0005** (Proposed): local→cloud ID strategy decision surfaced. /
+  **ADR 0005** (Propuesto): se expone la decisión de estrategia de IDs local→nube.
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
@@ -44,6 +49,17 @@
   **Documentación reorganizada** de un spec monolítico a registro-de-decisión +
   convenciones bajo demanda, para reducir coste de tokens y deriva.
   → ADR [0004](docs/decisions/0004-docs-conventions-vs-decision-record.md)
+- **Hardened after adversarial review** (2 independent agents): fixed
+  `rusqlite`/`rusqlite_migration` version incompatibility in Plan 1, specified the
+  heartbeat/orphan-recovery mechanism (Plan 3), removed schema duplication, fixed a
+  misleading partial-index comment, added SvelteKit SSR check, and **removed the
+  `Co-Authored-By` trailer** to comply with the repo rule. /
+  **Endurecido tras revisión adversarial** (2 agentes independientes): corregida la
+  incompatibilidad de versiones `rusqlite`/`rusqlite_migration` en Plan 1,
+  especificado el mecanismo de heartbeat/recuperación (Plan 3), eliminada la
+  duplicación de esquema, corregido un comentario engañoso del índice parcial,
+  añadido chequeo SSR de SvelteKit, y **eliminado el trailer `Co-Authored-By`** para
+  cumplir la regla del repo.
 
 ### 🇬🇧 Decided / 🇪🇸 Decidido
 - **Stack:** Tauri (Rust + Svelte/TS) over Python/PySide6. /

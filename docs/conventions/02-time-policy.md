@@ -49,6 +49,10 @@ GROUP BY t.project_id, s.task_id;
 
 Excluir `is_suspect` evita que una sesión huérfana infle el día.
 
+La consulta devuelve el desglose **por tarea**. El **total por proyecto** se deriva
+en la capa de aplicación sumando `ms` de sus tareas (o con un `GROUP BY
+t.project_id` aparte). No se duplica la lógica en SQL; se decide en Plan 3.
+
 ## Sesión huérfana (`ended_at = NULL` al arrancar la app)
 
 No se confía en su duración:
@@ -57,8 +61,23 @@ No se confía en su duración:
 2. Se cierra en `last_heartbeat_at` (si existe) o en `started_at`.
 3. Se marca `is_suspect = 1` para no contaminar reportes en silencio.
 
-Mientras una sesión corre, se persiste `last_heartbeat_at` cada ~30 s como ancla
-de recuperación si el proceso muere.
+### Mecanismo (diseño de Plan 3 — no es magia)
+
+El heartbeat y la recuperación necesitan código concreto; no existen "solos":
+
+- **Escritor del heartbeat:** mientras una sesión corre, el **frontend** invoca un
+  comando `heartbeat` (Tauri) cada ~30 s que hace
+  `UPDATE time_session SET last_heartbeat_at = :now WHERE ended_at IS NULL`. Sin
+  este escritor, `last_heartbeat_at` queda **siempre NULL** y la recuperación cae
+  a `started_at` (0 min). Es una pieza obligatoria, no opcional.
+- **Recuperación:** un caso de uso `RecoverOrphanSessionsOnStartup`, invocado desde
+  el `setup` de `lib.rs` **antes** de `manage(...)`. Aunque el índice único parcial
+  garantiza ≤1 sesión corriendo, el caso de uso debe iterar defensivamente (por si
+  una BD legacy/migración fallida dejó varias) y cerrar todas.
+- **Alcance:** ambas piezas se implementan en **Plan 3** (cronómetro). El esquema
+  (columnas `last_heartbeat_at`, `is_suspect`) se crea en Plan 1; la lógica llega
+  en Plan 3. Hasta entonces, la recuperación no está operativa: documentado, no
+  olvidado.
 
 ## Dos relojes (UI vs BD)
 

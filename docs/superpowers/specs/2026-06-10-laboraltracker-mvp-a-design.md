@@ -102,6 +102,11 @@ StartTimerUseCase.execute(task_id):
 
 UI tickea en JS solo para mostrar; el backend es la fuente de verdad al parar.
 
+**Decisión de producto (MVP A):** iniciar un cronómetro **detiene en silencio** el
+anterior, sin diálogo de confirmación. Es comportamiento intencional, no atajo
+técnico. Revisar en sub-proyectos futuros si conviene un aviso (p. ej. al cambiar
+de proyecto). Documentado para que no se implemente "por inercia".
+
 ---
 
 ## 5. Reglas vivas (enlaces — fuente de verdad en convenciones)

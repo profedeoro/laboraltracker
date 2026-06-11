@@ -24,8 +24,11 @@ presentation ──► application ──► domain (traits/puertos) ◄── i
 - **`application`**: depende solo de *traits* del dominio (puertos).
 - **`infrastructure`**: implementa esos traits con `rusqlite`.
 - **`presentation`**: traduce comando Tauri ↔ caso de uso. Sin lógica de negocio.
-- **`lib.rs`** (*composition root*): único lugar que conoce las implementaciones
-  concretas; arma la DI y registra los comandos.
+- **`lib.rs`** (*composition root*): el **único** lugar de la app donde se
+  construyen e inyectan las implementaciones concretas (abrir BD, crear repos,
+  registrarlos en el estado de Tauri). "Composition root" = el punto de entrada
+  donde se "componen" todas las dependencias una sola vez; el resto del código solo
+  recibe abstracciones. Aquí también se registran los comandos.
 
 ## Puertos (traits del dominio)
 
@@ -37,8 +40,11 @@ Clock               now() -> epoch_millis_utc   (inyectable para tests)
 ```
 
 Semántica: **`add` = INSERT** de sesión nueva; **`save` = UPDATE** de una
-existente (`ended_at`/`is_suspect`). Alternativa aceptable: colapsar en `save`
-tipo upsert (se decide en el plan).
+existente (`ended_at`/`is_suspect`). **Decisión a cerrar en Plan 2** (no dejarla
+abierta al implementar): elegir entre mantener `add`/`save` separados o colapsar en
+un único `save`/`upsert`. Recomendación: mantener `add`/`save` separados — son
+operaciones de dominio distintas (crear vs. cerrar) y el índice único parcial
+protege el INSERT.
 
 ## Dueño único del invariante "una sola sesión activa"
 

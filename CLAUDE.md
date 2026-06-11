@@ -35,7 +35,8 @@ el tema que tocas; no todo el conjunto.
 
 - Git desde el commit 0. **Conventional commits** (`feat:`, `fix:`, `test:`,
   `refactor:`, `docs:`, `chore:`). Incrementos pequeños y revisables.
-  Ramas: `main` + `feature/…`.
+  Ramas: `main` + `feature/…`. **Sin** trailer `Co-Authored-By` ni atribución de
+  IA en los commits (regla de `~/.claude/CLAUDE.md`).
 - TDD por capas (`cargo test` + `proptest` para tiempo; `vitest` en front).
 - Una sola fuente de verdad por concepto; enlazar, no duplicar.
 - **Documentar cada cambio** (qué/cuándo) en [CHANGELOG.md](CHANGELOG.md) y

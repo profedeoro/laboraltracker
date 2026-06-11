@@ -11,8 +11,8 @@
 **Convenciones que aplican (cargar al implementar):**
 [03-concurrency.md](../../conventions/03-concurrency.md) ·
 [05-data-schema.md](../../conventions/05-data-schema.md) ·
-[CLAUDE.md](../../../CLAUDE.md). Commits: *conventional*, terminados con el trailer
-`Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`.
+[CLAUDE.md](../../../CLAUDE.md). Commits: *conventional* y **sin** trailer
+`Co-Authored-By` ni atribución de IA (regla de `~/.claude/CLAUDE.md`).
 
 ---
 
@@ -102,9 +102,7 @@ Verifica que `.gitignore` incluye `node_modules`, `/src-tauri/target`, `*.db`,
 `*.db-wal`, `*.db-shm`. Si falta alguno, añádelo.
 ```bash
 git add -A
-git commit -m "feat: scaffold Tauri 2 + Svelte/TS baseline
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+git commit -m "feat: scaffold Tauri 2 + Svelte/TS baseline"
 ```
 Expected: commit creado; `git status` limpio salvo artefactos ignorados.
 
@@ -122,8 +120,8 @@ Expected: commit creado; `git status` limpio salvo artefactos ignorados.
 En `src-tauri/Cargo.toml`, en `[dependencies]` añade (junto a las de Tauri ya
 presentes):
 ```toml
-rusqlite = { version = "0.32", features = ["bundled"] }
-rusqlite_migration = "1.2"
+rusqlite = { version = "0.32.1", features = ["bundled"] }
+rusqlite_migration = "1.3"
 thiserror = "1"
 ```
 Y en una sección nueva `[dev-dependencies]`:
@@ -133,6 +131,20 @@ tempfile = "3"
 ```
 > `features = ["bundled"]` compila SQLite con el binario: cero dependencias del
 > sistema. `serde`/`serde_json` ya vienen con el scaffold de Tauri.
+>
+> **⚠️ Compatibilidad de versiones (crítico):** `rusqlite` y `rusqlite_migration`
+> deben compartir la **misma** versión de `rusqlite` o Cargo enlaza dos crates
+> `rusqlite` distintas y `to_latest(&mut Connection)` no compila (E0308: dos tipos
+> `Connection` incompatibles). El par `rusqlite 0.32.x` + `rusqlite_migration 1.3`
+> comparten `rusqlite ^0.32`. **No** mezclar con `rusqlite_migration 1.2` (pide
+> `rusqlite ^0.31`).
+
+- [ ] **Step 1b: Verificar que NO hay `rusqlite` duplicado**
+
+Run: `cargo tree -d --manifest-path src-tauri/Cargo.toml`
+Expected: **no** aparece `rusqlite` listado dos veces. Si aparece, alinea las
+versiones (sube/baja `rusqlite_migration` hasta que su requisito de `rusqlite`
+coincida con el tuyo) y repite.
 
 - [ ] **Step 2: Crear el módulo `infrastructure`**
 
@@ -242,9 +254,7 @@ Expected: `test result: ok. 2 passed`.
 
 ```bash
 git add src-tauri/
-git commit -m "feat(infra): SQLite connection with per-connection pragmas
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+git commit -m "feat(infra): SQLite connection with per-connection pragmas"
 ```
 
 ---
@@ -380,9 +390,7 @@ git add src-tauri/
 git commit -m "feat(infra): 0001 schema migration with DB-enforced invariants
 
 - indice unico parcial garantiza una sola sesion activa
-- CHECK impide duraciones negativas
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+- CHECK impide duraciones negativas"
 ```
 
 ---
@@ -459,6 +467,19 @@ Reemplaza `src/routes/+page.svelte` por:
 > Sintaxis runes de Svelte 5 (`$state`, `onclick`). Si el scaffold trajo Svelte 4,
 > usa `let status = '—'` y `on:click={checkHealth}` en su lugar.
 
+- [ ] **Step 3b: Confirmar la configuración SSR/prerender de SvelteKit**
+
+Tauri usa `@sveltejs/adapter-static`. Verifica que existe `src/routes/+layout.ts`
+(o `.js`) con SSR desactivado, para que llamar a `@tauri-apps/api` nunca corra en
+un entorno de servidor/prerender:
+```ts
+export const ssr = false;
+export const prerender = true;
+```
+Expected: el archivo del scaffold ya trae estas líneas. Si no existe, créalo. En
+este plan `invoke` solo se llama al hacer clic (no en carga de módulo ni en
+`load()`), pero esta config evita que el build rompa si una página futura lo hace.
+
 - [ ] **Step 4: Arrancar la app y verificar de extremo a extremo**
 
 Run: `npm run tauri dev`
@@ -471,9 +492,7 @@ Cierra la ventana para terminar (Ctrl+C en la terminal).
 
 ```bash
 git add -A
-git commit -m "feat: wire SQLite into Tauri state and add health command + UI
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+git commit -m "feat: wire SQLite into Tauri state and add health command + UI"
 ```
 
 ---
@@ -494,21 +513,18 @@ En `CHANGELOG.md`, bajo `## [Unreleased]` → `### 🇬🇧 Added / 🇪🇸 Añ
   migración `0001` aplicada al arrancar, y un comando `health`.
 ```
 
-- [ ] **Step 2: Corregir la nota del esquema**
+- [ ] **Step 2: Verificar que `0001_init.sql` coincide con el doc canónico**
 
-En `docs/conventions/05-data-schema.md`, ajusta el bloque DDL para reflejar que el
-archivo real `0001_init.sql` **no** contiene `PRAGMA foreign_keys = ON;` (los
-pragmas se aplican por conexión en `db.rs`). Añade una línea:
-> El `0001_init.sql` real omite el `PRAGMA` inicial; los pragmas viven en
-> `infrastructure::db::open` (ver [03-concurrency.md](03-concurrency.md)).
+`docs/conventions/05-data-schema.md` ya documenta que el archivo real **no** lleva
+`PRAGMA foreign_keys = ON;` (pragmas por conexión). Verifica que tu
+`src-tauri/migrations/0001_init.sql` coincide carácter a carácter con el bloque DDL
+de ese doc (sin el PRAGMA). Si difieren, alinéalos. No debe quedar divergencia.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add CHANGELOG.md docs/
-git commit -m "docs: record foundation increment in changelog and schema note
-
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+git commit -m "docs: record foundation increment in changelog and schema note"
 ```
 
 ---

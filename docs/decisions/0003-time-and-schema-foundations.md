@@ -2,6 +2,11 @@
 
 - **Status:** Accepted
 - **Date:** 2026-06-11
+- **Nota (rev. 2026-06-11):** esta ADR fija la **política** de tiempo y
+  recuperación. El **mecanismo** concreto (quién escribe `last_heartbeat_at` y el
+  caso de uso `RecoverOrphanSessionsOnStartup`) se diseña e implementa en **Plan 3**;
+  ver [02-time-policy.md](../conventions/02-time-policy.md) → "Mecanismo". El
+  esquema (columnas) llega en Plan 1; la lógica en Plan 3.
 
 ## 🇬🇧 Context
 In a time tracker, time **is** the domain. The first spec left `Clock::now()`

@@ -7,9 +7,13 @@
 
 ## `0001_init.sql`
 
-```sql
-PRAGMA foreign_keys = ON;
+> El archivo real **no** incluye `PRAGMA foreign_keys = ON;`: los pragmas se
+> aplican **por conexión** en `infrastructure::db::open` (ver
+> [03-concurrency.md](03-concurrency.md)). Razón: `rusqlite_migration` corre cada
+> migración dentro de una transacción, y SQLite ignora `foreign_keys` en
+> transacción. Poner el PRAGMA aquí sería un no-op silencioso.
 
+```sql
 CREATE TABLE project (
     id          INTEGER PRIMARY KEY,
     name        TEXT    NOT NULL CHECK (length(trim(name)) > 0),
@@ -50,9 +54,14 @@ CREATE UNIQUE INDEX ux_one_running_session
 
 - `CHECK (ended_at >= started_at)`: red contra el salto de reloj de pared (ver
   [02-time-policy.md](02-time-policy.md)).
-- `ux_one_running_session`: defensa en profundidad. Alternativa más legible:
-  columna generada `is_running` + `UNIQUE INDEX` (SQLite trata múltiples `NULL`
-  como distintos, así que solo un `1` puede existir).
+- `ux_one_running_session`: defensa en profundidad. **Cómo funciona** (no es por
+  distinción de NULL): es un **índice de expresión parcial**. El `WHERE ended_at
+  IS NULL` limita el índice a las filas *corriendo*; para todas ellas la expresión
+  `(ended_at IS NULL)` vale `1`; `UNIQUE` sobre ese `1` ⇒ como máximo una fila
+  corriendo. Verificado contra SQLite live: la 2ª inserción abierta falla con
+  `UNIQUE constraint failed`.
+  > Ojo: `... ON time_session(task_id) WHERE ended_at IS NULL` sería **incorrecto**
+  > (permitiría una sesión activa *por tarea*). El índice debe ser global.
 - `ON DELETE CASCADE` solo funciona con `PRAGMA foreign_keys = ON` por conexión
   (ver [03-concurrency.md](03-concurrency.md)).
 
