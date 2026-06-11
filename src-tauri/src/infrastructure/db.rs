@@ -3,6 +3,8 @@ use std::path::Path;
 use std::sync::Mutex;
 
 /// Shared state injected by Tauri via `.manage(...)`.
+/// The inner connection is wired now but first read in Plan 2 (repositories).
+#[allow(dead_code)]
 pub struct Db(pub Mutex<Connection>);
 
 /// Opens a file-based connection with production pragmas.
@@ -19,6 +21,7 @@ pub fn open(path: &Path) -> rusqlite::Result<Connection> {
 }
 
 /// In-memory connection for tests. WAL does not apply in memory; only FK.
+#[cfg(test)]
 pub fn open_in_memory() -> rusqlite::Result<Connection> {
     let conn = Connection::open_in_memory()?;
     conn.execute_batch("PRAGMA foreign_keys = ON;")?;
