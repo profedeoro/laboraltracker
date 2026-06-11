@@ -38,6 +38,9 @@ el tema que tocas; no todo el conjunto.
   Ramas: `main` + `feature/…`.
 - TDD por capas (`cargo test` + `proptest` para tiempo; `vitest` en front).
 - Una sola fuente de verdad por concepto; enlazar, no duplicar.
+- **Documentar cada cambio** (qué/cuándo) en [CHANGELOG.md](CHANGELOG.md) y
+  **cada decisión** (por qué/para qué) como ADR en [docs/decisions/](docs/decisions/).
+  Ambos bilingües EN/ES. ADR = *por qué*; CHANGELOG = *qué/cuándo*.
 
 ## Comandos
 
