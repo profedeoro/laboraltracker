@@ -1,6 +1,7 @@
 use crate::domain::error::AppError;
-use crate::domain::ports::{Clock, ProjectRepository};
+use crate::domain::ports::{Clock, ProjectRepository, TaskRepository};
 use crate::domain::project::Project;
+use crate::domain::task::Task;
 
 /// Repositorio en memoria para tests de casos de uso (sin `SQLite`).
 #[derive(Default)]
@@ -26,5 +27,26 @@ pub struct FixedClock(pub i64);
 impl Clock for FixedClock {
     fn now(&self) -> i64 {
         self.0
+    }
+}
+
+/// Repositorio de tareas en memoria para tests de casos de uso (sin SQLite).
+#[derive(Default)]
+pub struct InMemoryTaskRepository {
+    pub items: Vec<Task>,
+}
+
+impl TaskRepository for InMemoryTaskRepository {
+    fn add(&mut self, task: &Task) -> Result<(), AppError> {
+        self.items.push(task.clone());
+        Ok(())
+    }
+    fn list_by_project(&self, project_id: &str) -> Result<Vec<Task>, AppError> {
+        Ok(self
+            .items
+            .iter()
+            .filter(|t| t.project_id == project_id)
+            .cloned()
+            .collect())
     }
 }
