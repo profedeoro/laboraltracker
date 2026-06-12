@@ -99,6 +99,24 @@ mod tests {
     }
 
     #[test]
+    fn list_by_project_orders_by_created_at() {
+        let conn = migrated();
+        seed_project(&conn, "p1");
+        let mut repo = SqliteTaskRepository::new(&conn);
+        // Insert deliberately out of chronological order.
+        repo.add(&Task::new("t2".into(), "p1".into(), "second".into(), 200).unwrap())
+            .unwrap();
+        repo.add(&Task::new("t1".into(), "p1".into(), "first".into(), 100).unwrap())
+            .unwrap();
+        repo.add(&Task::new("t3".into(), "p1".into(), "third".into(), 300).unwrap())
+            .unwrap();
+
+        let out = repo.list_by_project("p1").unwrap();
+        let order: Vec<&str> = out.iter().map(|t| t.name.as_str()).collect();
+        assert_eq!(order, ["first", "second", "third"], "debe ordenar por created_at asc");
+    }
+
+    #[test]
     fn add_fails_when_project_fk_missing() {
         let conn = migrated();
         let mut repo = SqliteTaskRepository::new(&conn);
