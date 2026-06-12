@@ -3,8 +3,6 @@ use ts_rs::TS;
 
 /// Error único de aplicación: invariantes de dominio + fallos de repositorio.
 /// Serializable para el frontend; tipo TS generado por ts-rs.
-// TaskNameEmpty and NotFound are forward-declared for Plan 3 (tasks); part of the contract.
-#[allow(dead_code)]
 #[derive(Debug, thiserror::Error, Serialize, TS)]
 #[ts(export, export_to = "../../src/lib/bindings/")]
 #[serde(tag = "kind", content = "detail")]
