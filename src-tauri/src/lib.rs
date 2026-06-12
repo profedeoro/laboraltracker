@@ -1,6 +1,7 @@
 mod application;
 mod domain;
 mod infrastructure;
+mod presentation;
 
 use infrastructure::db::{self, Db};
 use std::sync::Mutex;
@@ -29,7 +30,11 @@ pub fn run() {
             app.manage(Db(Mutex::new(conn)));
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![health])
+        .invoke_handler(tauri::generate_handler![
+            health,
+            presentation::commands::create_project,
+            presentation::commands::list_projects
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
