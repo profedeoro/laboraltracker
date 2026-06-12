@@ -44,6 +44,15 @@
   `Mutex<Connection>`; migración `0001` aplicada al arrancar (PK ULID `TEXT`, índice
   único parcial que garantiza una sola sesión activa, `CHECK` contra duración
   negativa); comando `health`; 5/5 tests Rust en verde; 0 warnings.
+- **Projects slice** (Plan 2): create/list projects end-to-end — pure domain
+  (`Project` + non-empty-name invariant), ports, `CreateProject`/`ListProjects`
+  use cases, `SqliteProjectRepository`, `ts-rs`-generated DTO/error types, Tauri
+  commands, and a Svelte UI. /
+  **Slice de Proyectos** (Plan 2): crear/listar proyectos de punta a punta —
+  dominio puro (`Project` + invariante de nombre), puertos, casos de uso
+  `CreateProject`/`ListProjects`, `SqliteProjectRepository`, tipos DTO/error
+  generados con `ts-rs`, comandos Tauri y UI Svelte.
+  → `docs/superpowers/plans/2026-06-11-laboraltracker-projects.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
