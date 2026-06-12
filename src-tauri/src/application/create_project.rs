@@ -2,7 +2,7 @@ use crate::domain::error::AppError;
 use crate::domain::ports::{Clock, ProjectRepository};
 use crate::domain::project::Project;
 
-/// Caso de uso: crear un proyecto. Genera el id ULID y sella created_at con el Clock.
+/// Caso de uso: crear un proyecto. Genera el id ULID y sella `created_at` con el Clock.
 pub struct CreateProjectUseCase;
 
 impl CreateProjectUseCase {

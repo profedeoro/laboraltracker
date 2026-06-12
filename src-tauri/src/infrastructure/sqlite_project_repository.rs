@@ -3,7 +3,7 @@ use crate::domain::ports::ProjectRepository;
 use crate::domain::project::Project;
 use rusqlite::Connection;
 
-/// Adaptador SQLite del puerto ProjectRepository.
+/// Adaptador `SQLite` del puerto `ProjectRepository`.
 pub struct SqliteProjectRepository<'a> {
     conn: &'a Connection,
 }
@@ -28,7 +28,7 @@ fn row_to_project(row: &rusqlite::Row) -> rusqlite::Result<Project> {
     })
 }
 
-impl<'a> ProjectRepository for SqliteProjectRepository<'a> {
+impl ProjectRepository for SqliteProjectRepository<'_> {
     fn add(&mut self, project: &Project) -> Result<(), AppError> {
         self.conn
             .execute(
@@ -39,7 +39,7 @@ impl<'a> ProjectRepository for SqliteProjectRepository<'a> {
                     project.name,
                     project.color,
                     project.created_at,
-                    project.archived as i64,
+                    i64::from(project.archived),
                 ],
             )
             .map_err(map_err)?;

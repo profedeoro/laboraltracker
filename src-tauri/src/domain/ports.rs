@@ -10,7 +10,7 @@ pub trait ProjectRepository {
     fn find_by_id(&self, id: &str) -> Result<Option<Project>, AppError>;
 }
 
-/// Reloj inyectable. now() = epoch millis UTC (ver 02-time-policy.md).
+/// Reloj inyectable. `now()` = epoch millis UTC (ver 02-time-policy.md).
 pub trait Clock {
     fn now(&self) -> i64;
 }

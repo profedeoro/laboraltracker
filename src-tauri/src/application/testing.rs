@@ -2,7 +2,7 @@ use crate::domain::error::AppError;
 use crate::domain::ports::{Clock, ProjectRepository};
 use crate::domain::project::Project;
 
-/// Repositorio en memoria para tests de casos de uso (sin SQLite).
+/// Repositorio en memoria para tests de casos de uso (sin `SQLite`).
 #[derive(Default)]
 pub struct InMemoryProjectRepository {
     pub items: Vec<Project>,
