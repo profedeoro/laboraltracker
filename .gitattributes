@@ -1,0 +1,3 @@
+# Generated TS bindings (ts-rs) are written with LF; pin LF so regenerating them
+# during `cargo test` does not churn the working tree on Windows (CRLF autoconv).
+src/lib/bindings/*.ts text eol=lf
