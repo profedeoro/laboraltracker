@@ -13,3 +13,6 @@ vite.config.ts.timestamp-*
 *.db
 *.db-wal
 *.db-shm
+
+# Local AI agent / tooling state (not part of the project)
+.claude/
