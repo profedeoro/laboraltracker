@@ -5,6 +5,8 @@ use crate::domain::project::Project;
 pub trait ProjectRepository {
     fn add(&mut self, project: &Project) -> Result<(), AppError>;
     fn list(&self) -> Result<Vec<Project>, AppError>;
+    // Forward-declared for Plan 3 (tasks); part of the contract.
+    #[allow(dead_code)]
     fn find_by_id(&self, id: &str) -> Result<Option<Project>, AppError>;
 }
 

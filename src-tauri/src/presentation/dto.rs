@@ -4,7 +4,7 @@ use ts_rs::TS;
 
 #[derive(Debug, Serialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export, export_to = "../src/lib/bindings/")]
+#[ts(export, export_to = "../../src/lib/bindings/")]
 pub struct ProjectDto {
     pub id: String,
     pub name: String,
