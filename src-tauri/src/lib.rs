@@ -33,7 +33,9 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             health,
             presentation::commands::create_project,
-            presentation::commands::list_projects
+            presentation::commands::list_projects,
+            presentation::commands::create_task,
+            presentation::commands::list_tasks
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
