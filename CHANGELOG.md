@@ -53,6 +53,19 @@
   `CreateProject`/`ListProjects`, `SqliteProjectRepository`, tipos DTO/error
   generados con `ts-rs`, comandos Tauri y UI Svelte.
   → `docs/superpowers/plans/2026-06-11-laboraltracker-projects.md`
+- **Tasks slice** (Plan 3): create/list tasks within a project end-to-end — pure
+  domain (`Task` + non-empty-name invariant), `TaskRepository` port,
+  `CreateTask` (with project-existence check → `NotFound`) / `ListTasks` use
+  cases, `SqliteTaskRepository`, `ts-rs`-generated `TaskDto`, Tauri commands, and
+  a master-detail Svelte UI. Closes Plan 2's forward-declared `find_by_id` /
+  `AppError` items (removed `#[allow(dead_code)]`). /
+  **Slice de Tareas** (Plan 3): crear/listar tareas dentro de un proyecto de punta
+  a punta — dominio puro (`Task` + invariante de nombre), puerto `TaskRepository`,
+  casos de uso `CreateTask` (con verificación de proyecto → `NotFound`) /
+  `ListTasks`, `SqliteTaskRepository`, `TaskDto` generado con `ts-rs`, comandos
+  Tauri y UI Svelte maestro-detalle. Cierra los ítems forward-declared de Plan 2
+  (`find_by_id` / `AppError`; se quitó `#[allow(dead_code)]`).
+  → `docs/superpowers/plans/2026-06-12-laboraltracker-tasks.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
