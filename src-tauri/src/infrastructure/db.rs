@@ -3,8 +3,6 @@ use std::path::Path;
 use std::sync::Mutex;
 
 /// Shared state injected by Tauri via `.manage(...)`.
-/// The inner connection is wired now but first read in Plan 2 (repositories).
-#[allow(dead_code)]
 pub struct Db(pub Mutex<Connection>);
 
 /// Opens a file-based connection with production pragmas.
