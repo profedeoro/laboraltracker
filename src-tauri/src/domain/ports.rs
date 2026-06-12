@@ -14,3 +14,11 @@ pub trait ProjectRepository {
 pub trait Clock {
     fn now(&self) -> i64;
 }
+
+use crate::domain::task::Task;
+
+/// Puerto de persistencia de tareas. La infraestructura lo implementa.
+pub trait TaskRepository {
+    fn add(&mut self, task: &Task) -> Result<(), AppError>;
+    fn list_by_project(&self, project_id: &str) -> Result<Vec<Task>, AppError>;
+}
