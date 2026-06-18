@@ -61,6 +61,21 @@ impl TaskRepository for SqliteTaskRepository<'_> {
         }
         Ok(out)
     }
+
+    fn find_by_id(&self, id: &str) -> Result<Option<Task>, AppError> {
+        let mut stmt = self
+            .conn
+            .prepare(
+                "SELECT id, project_id, name, created_at, completed
+                 FROM task WHERE id = ?1",
+            )
+            .map_err(map_err)?;
+        let mut rows = stmt.query_map([id], row_to_task).map_err(map_err)?;
+        match rows.next() {
+            Some(r) => Ok(Some(r.map_err(map_err)?)),
+            None => Ok(None),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -127,5 +142,16 @@ mod tests {
             matches!(r, Err(AppError::Repository(_))),
             "la FK debe rechazar un project_id inexistente"
         );
+    }
+
+    #[test]
+    fn find_by_id_returns_task_or_none() {
+        let conn = migrated();
+        seed_project(&conn, "p1");
+        let mut repo = SqliteTaskRepository::new(&conn);
+        repo.add(&Task::new("t1".into(), "p1".into(), "A".into(), 1).unwrap())
+            .unwrap();
+        assert_eq!(repo.find_by_id("t1").unwrap().map(|t| t.name), Some("A".to_string()));
+        assert_eq!(repo.find_by_id("nope").unwrap(), None);
     }
 }
