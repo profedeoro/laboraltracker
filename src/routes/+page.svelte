@@ -70,10 +70,15 @@
   {#if $projects.length === 0}<p><em>Sin proyectos todavía.</em></p>{/if}
 
   {#if $selectedProjectId}
+    {@const selected = $projects.find((p) => p.id === $selectedProjectId)}
     <hr style="margin: 1.5rem 0;" />
-    <h2>Tareas</h2>
+    <h2>Tareas de <span style="color: #2563eb;">{selected?.name ?? ''}</span></h2>
     <form onsubmit={submitTask} style="display: flex; gap: .5rem; margin: 1rem 0;">
-      <input placeholder="Nombre de la tarea" bind:value={taskName} required />
+      <input
+        placeholder="Nueva tarea para {selected?.name ?? 'el proyecto'}"
+        bind:value={taskName}
+        required
+      />
       <button type="submit">Crear tarea</button>
     </form>
     <ul>
