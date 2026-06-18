@@ -49,4 +49,7 @@ impl TaskRepository for InMemoryTaskRepository {
             .cloned()
             .collect())
     }
+    fn find_by_id(&self, id: &str) -> Result<Option<Task>, AppError> {
+        Ok(self.items.iter().find(|t| t.id == id).cloned())
+    }
 }
