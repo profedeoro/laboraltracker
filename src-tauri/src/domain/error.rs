@@ -15,6 +15,10 @@ pub enum AppError {
     NotFound(String),
     #[error("repository error: {0}")]
     Repository(String),
+    #[error("clock went backwards: now is before the session start")]
+    ClockWentBackwards,
+    #[error("no running session")]
+    NoRunningSession,
 }
 
 #[cfg(test)]
