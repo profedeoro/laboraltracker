@@ -104,6 +104,20 @@
   por borrado lógico + `Restrict`, y definió restricciones únicas de negocio.
   Solo análisis; aún sin código de plataforma.
   → `docs/saas/00-architecture-overview.md`, `docs/saas/01-data-model-prisma.md`
+- **SaaS API & security doc**: REST conventions, per-module endpoints, the
+  agent→platform **sync endpoint** (idempotent ULID upsert, device authorization,
+  `SyncBatch` audit, partial per-item response, and the name-collision policy:
+  item-level reject — no silent rename/merge), JWT access + opaque rotating
+  refresh tokens, the four ordered guards (auth→permission→tenant→ownership),
+  cross-cutting hardening and a standard error shape. /
+  **Doc de API y seguridad SaaS**: convenciones REST, endpoints por módulo, el
+  **endpoint de sync** agente→plataforma (upsert idempotente por ULID,
+  autorización de dispositivo, auditoría `SyncBatch`, respuesta parcial por ítem y
+  la política de colisión de nombres: rechazo por ítem — sin renombrar/mergear en
+  silencio), JWT + refresh opaco rotatorio, los cuatro guards en orden
+  (auth→permiso→tenant→ownership), hardening transversal y forma de error
+  estándar.
+  → `docs/saas/02-api-and-security.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
