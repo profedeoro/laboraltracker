@@ -83,6 +83,23 @@
   cronómetro en vivo. Agrega `TaskRepository::find_by_id`.
   → `docs/superpowers/plans/2026-06-18-laboraltracker-timer-core.md`
 
+- **SaaS platform architecture docs** (the "two halves" web platform that
+  complements the desktop agent): foundational doc (vision, 5-role RBAC matrix,
+  15 modules, system architecture + agent↔platform sync flows) and the Prisma
+  data model (13 models — Company/User/Role/Permission/Team/Project/Task/
+  TimeEntry/ActivityLog/Screenshot/Report/Session/AuditLog — multi-tenant by
+  `companyId`, ULID PKs shared with the agent, `BigInt` epoch-millis for
+  agent-born instants vs `DateTime` for platform metadata). Analysis only; no
+  platform code yet. /
+  **Docs de arquitectura de la plataforma SaaS** (la mitad web que complementa al
+  agente de escritorio): documento fundacional (visión, matriz RBAC de 5 roles,
+  15 módulos, arquitectura del sistema + flujos de sync agente↔plataforma) y el
+  modelo de datos Prisma (13 modelos, multi-tenant por `companyId`, PK ULID
+  compartidas con el agente, `BigInt` epoch-millis para instantes del agente vs
+  `DateTime` para metadatos de plataforma). Solo análisis; aún sin código de
+  plataforma.
+  → `docs/saas/00-architecture-overview.md`, `docs/saas/01-data-model-prisma.md`
+
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
   policy, midnight overlap, orphan-session recovery, partial unique index for the
