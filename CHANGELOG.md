@@ -187,6 +187,15 @@
   éxito duros (el agente compila/arranca idéntico; los esqueletos bootean). pnpm
   workspaces para la plataforma; el agente queda standalone con npm.
   → `docs/superpowers/specs/2026-06-19-monorepo-fase0-design.md`
+- **Phase 0 implementation plan** (monorepo + scaffold): task-by-task plan for
+  slice 0a (move agent to `apps/agent`, pnpm workspace, `.gitignore`) and slice 0b
+  (`@lt/contracts`, NestJS api with `GET /health`, Next.js web, dev Postgres, CI),
+  each its own branch/PR, with exact commands and verification. /
+  **Plan de implementación de la Fase 0** (monorepo + scaffold): plan tarea por
+  tarea para el slice 0a (mover agente a `apps/agent`, workspace pnpm,
+  `.gitignore`) y el slice 0b (`@lt/contracts`, api NestJS con `GET /health`, web
+  Next.js, Postgres de dev, CI), cada uno su rama/PR, con comandos y verificación.
+  → `docs/superpowers/plans/2026-06-19-monorepo-fase0.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
@@ -242,6 +251,15 @@
   request-id, métricas RED en `/sync/*`, y registros de corrida de job + alertas
   ante fallos silenciosos (`SyncBatch` promovido a señal operativa).
   → ADR [0008](docs/decisions/0008-observability-baseline.md)
+- **SaaS — time-naming seam (kept on purpose):** agent stays
+  `TimeSession`/`time_session`, platform stays `TimeEntry` (a superset — also
+  `source=MANUAL`); no rename, no third name. The shared ULID is the contract, not
+  the type name; the seam is made explicit in docs 00/01. /
+  **SaaS — seam de naming de tiempo (mantenido a propósito):** el agente queda
+  `TimeSession`/`time_session`, la plataforma queda `TimeEntry` (superconjunto —
+  también `source=MANUAL`); sin renombrar, sin tercer nombre. El ULID compartido es
+  el contrato, no el nombre del tipo; el seam se explicita en docs 00/01.
+  → ADR [0009](docs/decisions/0009-time-naming-seam-agent-vs-platform.md)
 
 ---
 
