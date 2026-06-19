@@ -131,6 +131,20 @@
   transparencia hacia el empleado, y cómo el sistema **hace cumplir** la
   privacidad por diseño (no solo la promete).
   → `docs/saas/03-privacy-policy.md`
+- **SaaS backend structure doc** (NestJS): feature-modular + layered organization,
+  folder layout, module anatomy (controller/service/repository/dto), where the
+  four guards live and why they are cross-cutting (multi-tenant safety), the
+  special `auth`/`sync`/`reports` modules and retention job, boot-time hardening
+  (`main.ts`), env validation, and the testing pyramid (incl. the mandatory
+  cross-tenant isolation e2e test). /
+  **Doc de estructura backend SaaS** (NestJS): organización modular por feature +
+  capas, layout de carpetas, anatomía de módulo (controller/service/repository/
+  dto), dónde viven los cuatro guards y por qué son transversales (seguridad
+  multi-tenant), los módulos especiales `auth`/`sync`/`reports` y el job de
+  retención, hardening en el arranque (`main.ts`), validación de entorno, y la
+  pirámide de tests (incluido el test e2e obligatorio de aislamiento entre
+  empresas).
+  → `docs/saas/04-backend-nestjs-structure.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
