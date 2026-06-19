@@ -66,6 +66,22 @@
   Tauri y UI Svelte maestro-detalle. Cierra los ítems forward-declared de Plan 2
   (`find_by_id` / `AppError`; se quitó `#[allow(dead_code)]`).
   → `docs/superpowers/plans/2026-06-12-laboraltracker-tasks.md`
+- **Timer core** (Plan 4): start/stop a task's timer end-to-end with a single
+  global active session — `TimeSession` domain (clock-backwards guard, 12 h
+  suspect cap), `TimeSessionRepository` port, `StartTimer` (auto-closes the
+  running session; verifies the task exists) / `StopTimer` use cases,
+  `SqliteTimeSessionRepository` (partial-index defense), `ts-rs`-generated
+  `TimeSessionDto`, Tauri commands (`start_timer`/`stop_timer`/`running_timer`),
+  and a Svelte UI with a live elapsed counter. Adds `TaskRepository::find_by_id`. /
+  **Núcleo del cronómetro** (Plan 4): iniciar/parar el cronómetro de una tarea de
+  punta a punta con una sola sesión activa global — dominio `TimeSession` (guarda
+  contra reloj retrocedido, cap de 12 h como sospechosa), puerto
+  `TimeSessionRepository`, casos de uso `StartTimer` (cierra la sesión activa;
+  verifica que la tarea exista) / `StopTimer`, `SqliteTimeSessionRepository`
+  (defensa por índice único parcial), `TimeSessionDto` generado con `ts-rs`,
+  comandos Tauri (`start_timer`/`stop_timer`/`running_timer`) y UI Svelte con
+  cronómetro en vivo. Agrega `TaskRepository::find_by_id`.
+  → `docs/superpowers/plans/2026-06-18-laboraltracker-timer-core.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
