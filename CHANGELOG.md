@@ -159,6 +159,22 @@
   React Hook Form + Zod, tiempo UTC-millis como presentación, Server vs Client
   components y testing del frontend.
   → `docs/saas/05-frontend-nextjs-structure.md`
+- **SaaS repo decision + build roadmap doc** (closes the architecture doc set):
+  resolves the repo structure as a **monorepo** (decisive reason: the shared
+  agent↔platform sync contract — single source of truth, atomic cross-half PRs),
+  with the proposed `apps/`+`packages/` layout, and a 7-phase build roadmap
+  (0 monorepo/scaffold → 1 auth+tenancy+RBAC → 2 domain CRUD → 3 sync → 4 reports
+  → 5 capture/privacy → 6 advanced) feeding incremental spec→plan→slices, plus how
+  it interleaves with the agent's pending work. /
+  **Doc de decisión de repo + roadmap de construcción SaaS** (cierra el set de
+  arquitectura): resuelve la estructura como **monorepo** (razón decisiva: el
+  contrato de sync agente↔plataforma compartido — una fuente de verdad, PRs
+  atómicos entre mitades), con el layout `apps/`+`packages/` propuesto, y un
+  roadmap de 7 fases (0 monorepo/scaffold → 1 auth+tenancy+RBAC → 2 CRUD de
+  dominio → 3 sync → 4 reportes → 5 captura/privacidad → 6 avanzado) que alimenta
+  los slices incrementales, más cómo se entrelaza con el trabajo pendiente del
+  agente.
+  → `docs/saas/06-roadmap.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time

@@ -207,8 +207,9 @@ usará para su vista "hoy" en Plan 5, y la plataforma para reportes globales).
 5. **`05-roadmap.md`** — fases de construcción → de ahí salen los planes
    incrementales (spec→plan→build por slices, como el agente). *(brief §21)*
 
-## Decisión pendiente (al pasar a construir, no ahora)
-**Estructura de repos:** ¿la plataforma vive en un **repo nuevo separado**
-(recomendado: toolchains muy distintas — Rust/Cargo vs Node/npm — y despliegues
-distintos) o en un **monorepo** junto al agente? Se decide al scaffoldear código;
-la documentación de arquitectura vive en este repo (hogar del producto).
+## Decisión de repos: MONOREPO (resuelta 2026-06-19)
+**Estructura de repos:** **monorepo** — agente + plataforma en este repo. El
+argumento decisivo fue el **contrato de sync compartido** entre las dos mitades (un
+solo origen de verdad, cambios atómicos en un PR). El detalle, el layout y cómo se
+maneja el contra de las toolchains mixtas están en
+[`06-roadmap.md`](06-roadmap.md) §1.
