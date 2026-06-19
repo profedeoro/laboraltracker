@@ -145,6 +145,20 @@
   pirámide de tests (incluido el test e2e obligatorio de aislamiento entre
   empresas).
   → `docs/saas/04-backend-nestjs-structure.md`
+- **SaaS frontend structure doc** (Next.js App Router): feature-modular layout,
+  container/presentational components, scoped global state (auth/active-company/
+  role/permissions in Zustand, server data in fetch hooks), role-based UI that
+  mirrors — never replaces — backend RBAC, the centralized HTTP client (token +
+  transparent refresh + error mapping), React Hook Form + Zod forms, UTC-millis
+  time as presentation, Server vs Client components, and frontend testing. /
+  **Doc de estructura frontend SaaS** (Next.js App Router): layout modular por
+  feature, componentes container/presentational, estado global acotado
+  (auth/empresa-activa/rol/permisos en Zustand, datos de servidor en hooks de
+  fetch), UI por rol que refleja —nunca reemplaza— el RBAC del backend, cliente
+  HTTP centralizado (token + refresh transparente + mapeo de errores), formularios
+  React Hook Form + Zod, tiempo UTC-millis como presentación, Server vs Client
+  components y testing del frontend.
+  → `docs/saas/05-frontend-nextjs-structure.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
