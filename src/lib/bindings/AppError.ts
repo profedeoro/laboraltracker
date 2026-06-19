@@ -4,4 +4,4 @@
  * Error único de aplicación: invariantes de dominio + fallos de repositorio.
  * Serializable para el frontend; tipo TS generado por ts-rs.
  */
-export type AppError = { "kind": "ProjectNameEmpty" } | { "kind": "TaskNameEmpty" } | { "kind": "NotFound", "detail": string } | { "kind": "Repository", "detail": string };
+export type AppError = { "kind": "ProjectNameEmpty" } | { "kind": "TaskNameEmpty" } | { "kind": "NotFound", "detail": string } | { "kind": "Repository", "detail": string } | { "kind": "ClockWentBackwards" } | { "kind": "NoRunningSession" };
