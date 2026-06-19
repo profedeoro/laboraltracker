@@ -16,7 +16,13 @@
     const id = setInterval(() => {
       now = Date.now();
     }, 1000);
-    return () => clearInterval(id);
+    const hb = setInterval(() => {
+      if ($running) import('$lib/api/timer').then((m) => m.heartbeat());
+    }, 30000);
+    return () => {
+      clearInterval(id);
+      clearInterval(hb);
+    };
   });
 
   function formatElapsed(ms: number): string {

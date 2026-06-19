@@ -12,3 +12,7 @@ export function stopTimer(): Promise<TimeSessionDto> {
 export function runningTimer(): Promise<TimeSessionDto | null> {
   return invoke<TimeSessionDto | null>('running_timer');
 }
+
+export function heartbeat(): Promise<TimeSessionDto | null> {
+  return invoke<TimeSessionDto | null>('heartbeat');
+}

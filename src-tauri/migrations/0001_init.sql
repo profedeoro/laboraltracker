@@ -8,7 +8,7 @@ CREATE TABLE project (
 
 CREATE TABLE task (
     id          TEXT    PRIMARY KEY,
-    project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+    project_id  TEXT    NOT NULL REFERENCES project(id) ON DELETE RESTRICT,
     name        TEXT    NOT NULL CHECK (length(trim(name)) > 0),
     created_at  INTEGER NOT NULL,
     completed   INTEGER NOT NULL DEFAULT 0
@@ -17,7 +17,7 @@ CREATE INDEX ix_task_project ON task(project_id);
 
 CREATE TABLE time_session (
     id                TEXT    PRIMARY KEY,
-    task_id           TEXT    NOT NULL REFERENCES task(id) ON DELETE CASCADE,
+    task_id           TEXT    NOT NULL REFERENCES task(id) ON DELETE RESTRICT,
     started_at        INTEGER NOT NULL,
     ended_at          INTEGER,
     last_heartbeat_at INTEGER,

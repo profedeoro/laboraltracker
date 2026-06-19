@@ -175,6 +175,18 @@
   los slices incrementales, más cómo se entrelaza con el trabajo pendiente del
   agente.
   → `docs/saas/06-roadmap.md`
+- **Phase 0 design spec** (monorepo restructure + platform scaffold): two slices
+  (0a move the agent to `apps/agent` preserving relative paths + empty pnpm
+  workspace; 0b scaffold `apps/api`/`apps/web`/`packages/contracts` + dev Postgres
+  + path-filtered CI), with hard success criteria (agent builds/runs identically;
+  skeletons boot). pnpm workspaces for the platform; agent stays standalone npm. /
+  **Spec de diseño de la Fase 0** (reestructura a monorepo + scaffold de
+  plataforma): dos slices (0a mover el agente a `apps/agent` preservando paths
+  relativos + workspace pnpm vacío; 0b scaffold `apps/api`/`apps/web`/
+  `packages/contracts` + Postgres de dev + CI con path filters), con criterios de
+  éxito duros (el agente compila/arranca idéntico; los esqueletos bootean). pnpm
+  workspaces para la plataforma; el agente queda standalone con npm.
+  → `docs/superpowers/specs/2026-06-19-monorepo-fase0-design.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
@@ -211,6 +223,25 @@
 - **Architecture:** Clean/Hexagonal + SOLID (didactic, deliberately oversized). /
   **Arquitectura:** Clean/Hexagonal + SOLID (didáctica, sobredimensionada a propósito).
   → ADR [0002](docs/decisions/0002-hexagonal-architecture-solid.md)
+- **SaaS — permissions in the access token:** the JWT carries a signed
+  `permissions: string[]`, recomputed at login/refresh/switch-company; the
+  `PermissionGuard` becomes an O(1) check (no per-request DB resolution). /
+  **SaaS — permisos en el access token:** el JWT lleva un `permissions: string[]`
+  firmado, recalculado al login/refresh/switch-company; el `PermissionGuard` pasa a
+  ser una verificación O(1) (sin resolución contra BD por request).
+  → ADR [0006](docs/decisions/0006-permissions-in-access-token.md)
+- **SaaS — sync name-collision policy:** item-level reject (`NAME_TAKEN`/409), no
+  auto-rename, no auto-merge; the agent mirrors the partial unique index. /
+  **SaaS — colisión de nombres en la sync:** rechazo por ítem (`NAME_TAKEN`/409),
+  sin auto-renombrar ni auto-mergear; el agente espeja el índice único parcial.
+  → ADR [0007](docs/decisions/0007-sync-name-collision-policy.md)
+- **SaaS — observability baseline:** health checks, structured logging with
+  request-id, RED metrics on `/sync/*`, and job-run records + alerting on silent
+  failures (`SyncBatch` promoted to an operational signal). /
+  **SaaS — línea base de observabilidad:** health checks, logging estructurado con
+  request-id, métricas RED en `/sync/*`, y registros de corrida de job + alertas
+  ante fallos silenciosos (`SyncBatch` promovido a señal operativa).
+  → ADR [0008](docs/decisions/0008-observability-baseline.md)
 
 ---
 

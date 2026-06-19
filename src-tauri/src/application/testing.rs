@@ -65,6 +65,14 @@ impl TimeSessionRepository for InMemoryTimeSessionRepository {
     fn running(&self) -> Result<Option<TimeSession>, AppError> {
         Ok(self.items.iter().find(|s| s.ended_at.is_none()).cloned())
     }
+    fn list_running(&self) -> Result<Vec<TimeSession>, AppError> {
+        Ok(self
+            .items
+            .iter()
+            .filter(|s| s.ended_at.is_none())
+            .cloned()
+            .collect())
+    }
     fn add(&mut self, session: &TimeSession) -> Result<(), AppError> {
         self.items.push(session.clone());
         Ok(())
