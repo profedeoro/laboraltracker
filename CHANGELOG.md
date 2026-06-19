@@ -118,6 +118,19 @@
   (auth→permiso→tenant→ownership), hardening transversal y forma de error
   estándar.
   → `docs/saas/02-api-and-security.md`
+- **SaaS privacy & monitoring doc** (product + legal): what is captured and what
+  is **not** (activity counts, **no keylogging**, no camera/audio), per-company
+  typed policy (`CompanyTrackingSettings`, screenshots off by default),
+  role-scoped visibility, retention/deletion (soft-delete + retention job),
+  employee transparency, and how the system **enforces** privacy by design (not
+  just promises). /
+  **Doc de privacidad y monitoreo SaaS** (producto + legal): qué se captura y qué
+  **no** (conteos de actividad, **sin keylogging**, sin cámara/audio), política
+  tipada por empresa (`CompanyTrackingSettings`, capturas off por defecto),
+  visibilidad acotada por rol, retención/borrado (soft-delete + job de retención),
+  transparencia hacia el empleado, y cómo el sistema **hace cumplir** la
+  privacidad por diseño (no solo la promete).
+  → `docs/saas/03-privacy-policy.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
