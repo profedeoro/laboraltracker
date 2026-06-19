@@ -35,7 +35,10 @@ pub fn run() {
             presentation::commands::create_project,
             presentation::commands::list_projects,
             presentation::commands::create_task,
-            presentation::commands::list_tasks
+            presentation::commands::list_tasks,
+            presentation::commands::start_timer,
+            presentation::commands::stop_timer,
+            presentation::commands::running_timer
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,5 +1,6 @@
 use crate::domain::project::Project;
 use crate::domain::task::Task;
+use crate::domain::time_session::TimeSession;
 use serde::Serialize;
 use ts_rs::TS;
 
@@ -51,6 +52,34 @@ impl From<Task> for TaskDto {
             name: t.name,
             created_at: t.created_at,
             completed: t.completed,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "../../src/lib/bindings/")]
+pub struct TimeSessionDto {
+    pub id: String,
+    pub task_id: String,
+    #[ts(type = "number")]
+    pub started_at: i64,
+    #[ts(type = "number | null")]
+    pub ended_at: Option<i64>,
+    #[ts(type = "number | null")]
+    pub last_heartbeat_at: Option<i64>,
+    pub is_suspect: bool,
+}
+
+impl From<TimeSession> for TimeSessionDto {
+    fn from(s: TimeSession) -> Self {
+        Self {
+            id: s.id,
+            task_id: s.task_id,
+            started_at: s.started_at,
+            ended_at: s.ended_at,
+            last_heartbeat_at: s.last_heartbeat_at,
+            is_suspect: s.is_suspect,
         }
     }
 }
