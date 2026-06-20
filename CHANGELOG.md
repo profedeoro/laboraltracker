@@ -219,6 +219,18 @@
   y build de web en verde); aprobación de build scripts de sharp/unrs-resolver vía
   `allowBuilds`.
   → `apps/api`, `apps/web`, `packages/contracts`, `docker-compose.yml`, `.github/workflows/ci.yml`
+- **Phase 1 design spec** (auth + tenancy + RBAC): three slices (1a Prisma model
+  subset + migration + seed; 1b auth login/refresh-rotation/switch-company/me;
+  1c guards + `GET /members` + cross-tenant isolation e2e), argon2id hashing,
+  refresh tokens scoped to `(userId, companyId)` (Session gains `companyId`),
+  documented seed passwords, and a Postgres service added to CI. /
+  **Spec de diseño de la Fase 1** (auth + tenancy + RBAC): tres slices (1a modelo
+  Prisma subconjunto + migración + seed; 1b auth login/refresh-rotación/
+  switch-company/me; 1c guards + `GET /members` + e2e de aislamiento entre
+  empresas), hashing argon2id, refresh atado a `(userId, companyId)` (`Session`
+  gana `companyId`), passwords del seed documentados, y un servicio Postgres
+  agregado a la CI.
+  → `docs/superpowers/specs/2026-06-20-fase1-auth-tenancy-rbac-design.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
