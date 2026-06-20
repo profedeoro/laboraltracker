@@ -2,3 +2,9 @@ packages:
   - apps/api
   - apps/web
   - packages/*
+
+# Build scripts approval. Ambas son nativas legítimas:
+# sharp (imágenes de Next.js), unrs-resolver (ESLint).
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
