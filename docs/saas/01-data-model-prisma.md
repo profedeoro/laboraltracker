@@ -368,7 +368,10 @@ model Task {
 
 // ──────────────────── TIEMPO / ACTIVIDAD / CAPTURAS ────────────────────
 
-/// Sesión de tiempo consolidada (el `time_session` del agente).
+/// Intervalo de trabajo registrado. Un `time_session` del agente consolidado es
+/// UNA fuente (`source=AGENT`) de un `TimeEntry`; la plataforma también guarda filas
+/// `source=MANUAL` sin sesión del agente detrás (sin heartbeat/device). Por eso el
+/// nombre difiere del agente a propósito — es un superconjunto (ADR 0009).
 /// id = ULID del agente ⇒ idempotente en sync (upsert por id). Baja lógica.
 model TimeEntry {
   id              String   @id              // ULID del agente = idempotency key

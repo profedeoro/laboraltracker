@@ -41,6 +41,10 @@ normalmente se pierde entre las cabezas del equipo y el historial de git.
 | [0003](0003-time-and-schema-foundations.md) | Fundaciones de tiempo y esquema SQLite | Accepted |
 | [0004](0004-docs-conventions-vs-decision-record.md) | Convenciones vs. registro de decisión | Accepted |
 | [0005](0005-id-strategy-local-to-cloud.md) | Estrategia de IDs (local → nube): ULID texto | Accepted |
+| [0006](0006-permissions-in-access-token.md) | Permisos resueltos en el access token (JWT) | Accepted |
+| [0007](0007-sync-name-collision-policy.md) | Política de colisión de nombres en la sync | Accepted |
+| [0008](0008-observability-baseline.md) | Línea base de observabilidad de la plataforma | Accepted |
+| [0009](0009-time-naming-seam-agent-vs-platform.md) | Seam de naming: agente `TimeSession` ⇄ plataforma `TimeEntry` | Accepted |
 
 ## Plantilla / Template
 

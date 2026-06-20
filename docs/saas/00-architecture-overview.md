@@ -159,6 +159,11 @@ front; DTOs validados en el back). WebSockets solo si un caso lo justifica
   cuando hay red, **sincroniza por lotes** las sesiones/actividad/capturas.
 - **Idempotencia:** cada registro lleva su **ULID** (generado en el agente). El
   endpoint de sync hace *upsert* por ULID → reenviar el mismo lote no duplica.
+- **Seam de naming (a propósito):** `agent.time_session (source=AGENT) ⇒
+  platform.TimeEntry`. Los nombres difieren porque son conceptos distintos: en el
+  agente toda fila es una sesión de cronómetro medida; en la plataforma `TimeEntry`
+  es un superconjunto (también `source=MANUAL`). **El id es el contrato; el nombre
+  del tipo no** (ADR 0005, ADR 0009).
 - La plataforma es la **fuente de verdad consolidada**; el agente es la **fuente de
   captura**.
 
