@@ -196,8 +196,15 @@
   `.gitignore`) y el slice 0b (`@lt/contracts`, api NestJS con `GET /health`, web
   Next.js, Postgres de dev, CI), cada uno su rama/PR, con comandos y verificación.
   → `docs/superpowers/plans/2026-06-19-monorepo-fase0.md`
-
-### 🇬🇧 Changed / 🇪🇸 Cambiado
+- **Monorepo restructure** (Phase 0a): the desktop agent moved to `apps/agent/`
+  (relative paths preserved — Rust 44/44 tests green and the SvelteKit frontend
+  builds from the new location); empty pnpm workspace skeleton at the root
+  (`pnpm-workspace.yaml` + root `package.json`); `.gitignore` switched to
+  non-root-anchored patterns. /
+  **Reestructura a monorepo** (Fase 0a): el agente de escritorio movido a
+  `apps/agent/` (paths relativos preservados — Rust 44/44 tests en verde y el
+  frontend SvelteKit compila desde la nueva ubicación); esqueleto del workspace
+  pnpm en la raíz; `.gitignore` con patrones no anclados a la raíz.
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
   policy, midnight overlap, orphan-session recovery, partial unique index for the
   single-active-session invariant, `Mutex<Connection>` concurrency model, honest
