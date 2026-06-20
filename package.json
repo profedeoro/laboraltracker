@@ -2,5 +2,6 @@
   "name": "laboraltracker-workspace",
   "private": true,
   "version": "0.1.0",
-  "description": "LaboralTracker monorepo: desktop agent (apps/agent) + SaaS platform (apps/api, apps/web)."
+  "description": "LaboralTracker monorepo: desktop agent (apps/agent) + SaaS platform (apps/api, apps/web).",
+  "packageManager": "pnpm@11.8.0"
 }
