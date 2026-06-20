@@ -205,6 +205,22 @@
   `apps/agent/` (paths relativos preservados — Rust 44/44 tests en verde y el
   frontend SvelteKit compila desde la nueva ubicación); esqueleto del workspace
   pnpm en la raíz; `.gitignore` con patrones no anclados a la raíz.
+- **Platform scaffold** (Phase 0b): `packages/contracts` (`@lt/contracts`
+  placeholder), `apps/api` (NestJS, `GET /health` + passing unit test, depends on
+  `@lt/contracts` via `workspace:*`), `apps/web` (Next.js 16 App Router, dev port
+  3001), `docker-compose.yml` (Postgres 16 dev), `.env.example`, and path-filtered
+  GitHub Actions CI. Verified end-to-end: `pnpm install --frozen-lockfile`, api
+  test/build and web build all green; sharp/unrs-resolver build scripts approved
+  via `allowBuilds`. /
+  **Scaffold de plataforma** (Fase 0b): `packages/contracts`, `apps/api` (NestJS
+  con `GET /health` + test, depende de `@lt/contracts`), `apps/web` (Next.js 16),
+  `docker-compose.yml` (Postgres 16 dev), `.env.example` y CI con path filters.
+  Verificado de punta a punta (`pnpm install --frozen-lockfile`, test/build de api
+  y build de web en verde); aprobación de build scripts de sharp/unrs-resolver vía
+  `allowBuilds`.
+  → `apps/api`, `apps/web`, `packages/contracts`, `docker-compose.yml`, `.github/workflows/ci.yml`
+
+### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
   policy, midnight overlap, orphan-session recovery, partial unique index for the
   single-active-session invariant, `Mutex<Connection>` concurrency model, honest
