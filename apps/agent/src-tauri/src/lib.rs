@@ -3,7 +3,10 @@ mod domain;
 mod infrastructure;
 mod presentation;
 
+use application::recover_orphan::RecoverOrphanSessionsUseCase;
+use infrastructure::clock::SystemClock;
 use infrastructure::db::{self, Db};
+use infrastructure::sqlite_time_session_repository::SqliteTimeSessionRepository;
 use std::sync::Mutex;
 use tauri::Manager;
 
@@ -27,6 +30,10 @@ pub fn run() {
             let db_path = dir.join("laboraltracker.db");
             let mut conn = db::open(&db_path).expect("open db");
             db::apply(&mut conn).expect("apply migrations");
+            // Recuperar sesiones huérfanas antes de que la app pueda crear nuevas.
+            let mut session_repo = SqliteTimeSessionRepository::new(&conn);
+            RecoverOrphanSessionsUseCase::execute(&mut session_repo, &SystemClock)
+                .expect("recover orphan sessions");
             app.manage(Db(Mutex::new(conn)));
             Ok(())
         })
@@ -38,7 +45,8 @@ pub fn run() {
             presentation::commands::list_tasks,
             presentation::commands::start_timer,
             presentation::commands::stop_timer,
-            presentation::commands::running_timer
+            presentation::commands::running_timer,
+            presentation::commands::heartbeat
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

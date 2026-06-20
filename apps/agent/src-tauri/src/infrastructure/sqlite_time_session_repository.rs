@@ -46,6 +46,23 @@ impl TimeSessionRepository for SqliteTimeSessionRepository<'_> {
         }
     }
 
+    fn list_running(&self) -> Result<Vec<TimeSession>, AppError> {
+        let mut stmt = self
+            .conn
+            .prepare(
+                "SELECT id, task_id, started_at, ended_at, last_heartbeat_at, is_suspect
+                 FROM time_session WHERE ended_at IS NULL
+                 ORDER BY started_at",
+            )
+            .map_err(map_err)?;
+        let rows = stmt.query_map([], row_to_session).map_err(map_err)?;
+        let mut out = Vec::new();
+        for r in rows {
+            out.push(r.map_err(map_err)?);
+        }
+        Ok(out)
+    }
+
     fn add(&mut self, session: &TimeSession) -> Result<(), AppError> {
         self.conn
             .execute(

@@ -28,6 +28,9 @@ use crate::domain::time_session::TimeSession;
 pub trait TimeSessionRepository {
     /// La sesión actualmente en curso (`ended_at IS NULL`), si existe.
     fn running(&self) -> Result<Option<TimeSession>, AppError>;
+    /// Todas las sesiones actualmente en curso. Defensivo: normalmente ≤1 por el índice
+    /// único parcial, pero puede haber múltiples si la BD viene de una migración fallida.
+    fn list_running(&self) -> Result<Vec<TimeSession>, AppError>;
     fn add(&mut self, session: &TimeSession) -> Result<(), AppError>;
     fn update(&mut self, session: &TimeSession) -> Result<(), AppError>;
 }
