@@ -3,8 +3,12 @@ packages:
   - apps/web
   - packages/*
 
-# Build scripts approval. Ambas son nativas legítimas:
-# sharp (imágenes de Next.js), unrs-resolver (ESLint).
+# Build scripts approval. Todas son nativas legítimas:
+# sharp (imágenes de Next.js), unrs-resolver (ESLint),
+# prisma/@prisma/engines (descarga los binarios del engine de Prisma).
 allowBuilds:
+  '@prisma/client': true
+  '@prisma/engines': true
+  prisma: true
   sharp: true
   unrs-resolver: true
