@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ────────────────────────────── TENANT ──────────────────────────────
+
+model Company {
+  id        String        @id
+  name      String
+  slug      String        @unique
+  plan      Plan          @default(FREE)
+  status    CompanyStatus @default(ACTIVE)
+  createdAt DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime      @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime?     @db.Timestamptz(3)
+
+  members  CompanyMember[]
+  teams    Team[]
+  sessions Session[]
+}
+
+// ──────────────────── IDENTIDAD / MEMBRESÍA ────────────────────
+
+model User {
+  id           String     @id
+  email        String     @unique
+  passwordHash String
+  name         String
+  status       UserStatus @default(ACTIVE)
+  createdAt    DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime   @updatedAt @db.Timestamptz(3)
+  deletedAt    DateTime?  @db.Timestamptz(3)
+
+  memberships CompanyMember[]
+  sessions    Session[]
+}
+
+model CompanyMember {
+  id        String       @id
+  userId    String
+  companyId String
+  roleId    String
+  teamId    String?
+  status    MemberStatus @default(ACTIVE)
+  createdAt DateTime     @default(now()) @db.Timestamptz(3)
+  deletedAt DateTime?    @db.Timestamptz(3)
+
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company      Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  role         Role    @relation(fields: [roleId], references: [id])
+  team         Team?   @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  managedTeams Team[]  @relation("TeamManager")
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+  @@index([roleId])
+  @@index([teamId])
+}
+
+model Team {
+  id        String    @id
+  companyId String
+  name      String
+  managerId String?
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  deletedAt DateTime? @db.Timestamptz(3)
+
+  // Restrict (vs the Cascade on CompanyMember/Session): a Team is an aggregate
+  // with its own history, protected per the project's soft-delete policy.
+  // Companies are never hard-deleted (deletedAt), so the asymmetry never fires.
+  company Company         @relation(fields: [companyId], references: [id], onDelete: Restrict)
+  manager CompanyMember?  @relation("TeamManager", fields: [managerId], references: [id], onDelete: SetNull)
+  members CompanyMember[] @relation("TeamMembers")
+
+  @@unique([companyId, name])
+  @@index([companyId])
+  @@index([managerId])
+}
+
+// ────────────────────────────── RBAC ──────────────────────────────
+
+model Role {
+  id          String  @id
+  companyId   String?
+  key         RoleKey
+  name        String
+  description String?
+
+  members     CompanyMember[]
+  permissions RolePermission[]
+
+  // Enforces uniqueness for company-scoped roles (companyId NOT NULL). Global
+  // roles (companyId NULL) are guarded by a partial unique index added in the
+  // migration as raw SQL — Postgres treats NULLs as distinct, so this @@unique
+  // alone would not prevent duplicate global roles. See ADR 0010.
+  @@unique([companyId, key])
+}
+
+model Permission {
+  id          String  @id
+  key         String  @unique
+  description String?
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+// ────────────────────────────── AUTH ──────────────────────────────
+
+model Session {
+  id               String    @id
+  userId           String
+  companyId        String
+  deviceId         String?
+  refreshTokenHash String
+  expiresAt        DateTime  @db.Timestamptz(3)
+  revokedAt        DateTime? @db.Timestamptz(3)
+  createdAt        DateTime  @default(now()) @db.Timestamptz(3)
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([userId, companyId])
+  @@index([expiresAt])
+}
+
+// ────────────────────────────── ENUMS ──────────────────────────────
+
+enum Plan {
+  FREE
+  PRO
+  ENTERPRISE
+}
+
+enum CompanyStatus {
+  ACTIVE
+  SUSPENDED
+  CANCELLED
+}
+
+enum UserStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+enum MemberStatus {
+  ACTIVE
+  INVITED
+  SUSPENDED
+}
+
+enum RoleKey {
+  SUPER_ADMIN
+  COMPANY_ADMIN
+  MANAGER
+  EMPLOYEE
+  CLIENT_VIEWER
+}

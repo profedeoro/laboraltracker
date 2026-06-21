@@ -231,6 +231,21 @@
   gana `companyId`), passwords del seed documentados, y un servicio Postgres
   agregado a la CI.
   → `docs/superpowers/specs/2026-06-20-fase1-auth-tenancy-rbac-design.md`
+- **Phase 1a — data layer**: Prisma + the Phase 1 model subset
+  (Company/User/CompanyMember/Team/Role/Permission/RolePermission/Session with
+  `companyId`), initial migration `init_auth_tenancy`, `PrismaService`/`PrismaModule`
+  (`@Global`), and an idempotent seed (5 roles + 3 permissions + 2 demo companies
+  with users and memberships; `@node-rs/argon2` hashing, documented dev password).
+  Verified locally against dockerized Postgres: migration applies, seed runs twice
+  with stable counts (2 companies / 4 users / 5 roles / 3 perms / 4 members /
+  6 role-permissions). Prisma pinned to `^6` (see ADR 0010). /
+  **Fase 1a — capa de datos**: Prisma + el subconjunto Fase 1 del modelo, migración
+  inicial `init_auth_tenancy`, `PrismaService`/`PrismaModule` (`@Global`), y un seed
+  idempotente (5 roles + 3 permisos + 2 empresas demo con usuarios y membresías;
+  hashing `@node-rs/argon2`, password de dev documentado). Verificado localmente
+  contra el Postgres dockerizado: la migración aplica, el seed corre dos veces con
+  counts estables (2/4/5/3/4 + 6 role-permissions). Prisma pineado a `^6` (ver ADR 0010).
+  → `apps/api/prisma/`, `apps/api/src/database/`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
@@ -295,6 +310,13 @@
   también `source=MANUAL`); sin renombrar, sin tercer nombre. El ULID compartido es
   el contrato, no el nombre del tipo; el seam se explicita en docs 00/01.
   → ADR [0009](docs/decisions/0009-time-naming-seam-agent-vs-platform.md)
+- **SaaS — pin Prisma to v6:** v6 installed as v7 (latest), which forbids `url` in
+  the schema and requires a `prisma.config.ts` + driver adapter. Pinned to `^6` to
+  keep the classic `PrismaService extends PrismaClient`; v6→v7 is declared debt. /
+  **SaaS — pinear Prisma a v6:** se instaló la v7 (última), que prohíbe `url` en el
+  schema y exige `prisma.config.ts` + driver adapter. Pineado a `^6` para mantener el
+  `PrismaService extends PrismaClient` clásico; v6→v7 es deuda declarada.
+  → ADR [0010](docs/decisions/0010-pin-prisma-v6.md)
 
 ---
 

@@ -52,6 +52,10 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Prisma Client is a generated, non-versioned artifact: regenerate it from
+      # the schema before anything compiles against the model types (e.g. seed.ts
+      # imports RoleKey). Without this, a fresh install ships only the base stub.
+      - run: pnpm --filter api exec prisma generate
       - run: pnpm --filter api test
       - run: pnpm --filter api build
       - run: pnpm --filter web build
