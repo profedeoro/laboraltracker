@@ -104,3 +104,74 @@ describe('AuthService.login', () => {
     );
   });
 });
+
+describe('AuthService.refresh', () => {
+  const validSession = {
+    id: 's1',
+    userId: 'u1',
+    companyId: 'c1',
+    refreshTokenHash: 'hashed',
+    expiresAt: new Date(Date.now() + 86_400_000),
+    revokedAt: null,
+    userEmail: 'a@a.demo',
+  };
+
+  it('rejects a malformed refresh token with 401', async () => {
+    const tokens = makeTokens();
+    tokens.parseRefreshToken.mockReturnValue(null);
+    const svc = new AuthService(makeRepo(), tokens, makeConfig());
+    await expect(svc.refresh('garbage')).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it('detects reuse of a revoked token and revokes the whole chain', async () => {
+    const tokens = makeTokens();
+    tokens.parseRefreshToken.mockReturnValue({ sessionId: 's1', secret: 'secret' });
+    const repo = makeRepo({
+      findSessionById: jest
+        .fn()
+        .mockResolvedValue({ ...validSession, revokedAt: new Date() }),
+    });
+    const svc = new AuthService(repo, tokens, makeConfig());
+    await expect(svc.refresh('s1.secret')).rejects.toBeInstanceOf(UnauthorizedException);
+    expect(repo.revokeSessionChain).toHaveBeenCalledWith('u1', 'c1');
+  });
+
+  it('rejects an expired session with 401', async () => {
+    const tokens = makeTokens();
+    tokens.parseRefreshToken.mockReturnValue({ sessionId: 's1', secret: 'secret' });
+    tokens.verifyRefreshSecret.mockResolvedValue(true);
+    const repo = makeRepo({
+      findSessionById: jest
+        .fn()
+        .mockResolvedValue({ ...validSession, expiresAt: new Date(Date.now() - 1000) }),
+    });
+    const svc = new AuthService(repo, tokens, makeConfig());
+    await expect(svc.refresh('s1.secret')).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it('rejects a wrong secret with 401', async () => {
+    const tokens = makeTokens();
+    tokens.parseRefreshToken.mockReturnValue({ sessionId: 's1', secret: 'bad' });
+    tokens.verifyRefreshSecret.mockResolvedValue(false);
+    const repo = makeRepo({ findSessionById: jest.fn().mockResolvedValue(validSession) });
+    const svc = new AuthService(repo, tokens, makeConfig());
+    await expect(svc.refresh('s1.bad')).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it('rotates on a valid refresh: revokes the old session and issues a new pair', async () => {
+    const tokens = makeTokens();
+    tokens.parseRefreshToken.mockReturnValue({ sessionId: 's1', secret: 'secret' });
+    tokens.verifyRefreshSecret.mockResolvedValue(true);
+    const repo = makeRepo({
+      findSessionById: jest.fn().mockResolvedValue(validSession),
+      findMembership: jest.fn().mockResolvedValue(membership),
+    });
+    const svc = new AuthService(repo, tokens, makeConfig());
+
+    const result = await svc.refresh('s1.secret');
+
+    expect(repo.revokeSession).toHaveBeenCalledWith('s1');
+    expect(repo.createSession).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ accessToken: 'access.jwt', refreshToken: 'sid.secret' });
+  });
+});

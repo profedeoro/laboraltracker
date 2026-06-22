@@ -61,6 +61,35 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
+  async refresh(refreshToken: string): Promise<AuthTokens> {
+    const parsed = this.tokens.parseRefreshToken(refreshToken);
+    if (!parsed) throw new UnauthorizedException('Invalid refresh token');
+
+    const session = await this.repo.findSessionById(parsed.sessionId);
+    if (!session) throw new UnauthorizedException('Invalid refresh token');
+
+    // Reuse of an already-rotated token → token theft signal → kill the chain.
+    if (session.revokedAt) {
+      await this.repo.revokeSessionChain(session.userId, session.companyId);
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    if (session.expiresAt.getTime() < Date.now()) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const ok = await this.tokens.verifyRefreshSecret(parsed.secret, session.refreshTokenHash);
+    if (!ok) throw new UnauthorizedException('Invalid refresh token');
+
+    // Membership may have been revoked since issuance.
+    const membership = await this.repo.findMembership(session.userId, session.companyId);
+    if (!membership) throw new UnauthorizedException('Invalid refresh token');
+
+    // Rotate: revoke the presented session, issue a fresh pair for the SAME company.
+    await this.repo.revokeSession(session.id);
+    return this.issueTokens({ userId: session.userId, email: session.userEmail }, membership);
+  }
+
   protected async verifyPassword(plain: string, hash: string): Promise<boolean> {
     try {
       return await argonVerify(hash, plain);
