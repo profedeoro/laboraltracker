@@ -246,6 +246,19 @@
   contra el Postgres dockerizado: la migración aplica, el seed corre dos veces con
   counts estables (2/4/5/3/4 + 6 role-permissions). Prisma pineado a `^6` (ver ADR 0010).
   → `apps/api/prisma/`, `apps/api/src/database/`
+- **Phase 1b — auth**: email+password login (argon2 verify), company-scoped opaque
+  refresh tokens (`${sessionId}.${secret}`, argon2-hashed) with rotation and
+  reuse-chain revocation, `switch-company`, `GET /me`, logout. `TokenService`
+  (access JWT + refresh mechanics), `AuthService`, `AuthRepository`, a minimal
+  `AuthGuard` (JWT validation) with `@Public`/`@CurrentUser`, env validation (Zod)
+  at boot, global `ValidationPipe`, and the `/api/v1` prefix. Unit tests for
+  TokenService + AuthService; e2e login→me→refresh→reuse-401→logout. /
+  **Fase 1b — auth**: login email+password (verificación argon2), refresh opaco
+  por empresa con rotación y revocación de cadena por reuso, `switch-company`,
+  `GET /me`, logout. `TokenService`/`AuthService`/`AuthRepository`, `AuthGuard`
+  mínimo, validación de env (Zod) al arrancar, `ValidationPipe` global y prefijo
+  `/api/v1`. Tests unitarios + e2e del flujo completo.
+  → `apps/api/src/modules/auth/`, `apps/api/src/common/`, `apps/api/src/config/`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
