@@ -62,8 +62,7 @@ describe('AuthService.login', () => {
     });
     const tokens = makeTokens();
     const svc = new AuthService(repo, tokens, makeConfig());
-    tokens.verifyRefreshSecret.mockResolvedValue(false); // not used; password check uses argon verify
-    // password verification is delegated to TokenService.verifyRefreshSecret? No — see impl note.
+    // argon2.verify('h', 'bad') throws / returns false — rejects before reaching memberships
     await expect(svc.login({ email: 'a@a.demo', password: 'bad' })).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
@@ -139,7 +138,6 @@ describe('AuthService.refresh', () => {
   it('rejects an expired session with 401', async () => {
     const tokens = makeTokens();
     tokens.parseRefreshToken.mockReturnValue({ sessionId: 's1', secret: 'secret' });
-    tokens.verifyRefreshSecret.mockResolvedValue(true);
     const repo = makeRepo({
       findSessionById: jest
         .fn()

@@ -60,10 +60,10 @@ describe('Auth flow (e2e)', () => {
       .send({ refreshToken })
       .expect(401);
 
-    // logout with the new access token
+    // logout with the access token from the rotated session
     await request(app.getHttpServer())
       .post(`${base}/auth/logout`)
-      .set('Authorization', `Bearer ${accessToken}`)
+      .set('Authorization', `Bearer ${refreshed.body.accessToken}`)
       .expect(204);
   });
 
