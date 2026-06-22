@@ -56,6 +56,9 @@ jobs:
       # the schema before anything compiles against the model types (e.g. seed.ts
       # imports RoleKey). Without this, a fresh install ships only the base stub.
       - run: pnpm --filter api exec prisma generate
-      - run: pnpm --filter api test -- --testPathIgnorePatterns auth.repository.spec auth.e2e
+      # Unit suites only (mocked). The integration spec (*.repository.spec) is
+      # excluded via jest `testPathIgnorePatterns` in package.json — it needs a
+      # DB. The Postgres CI service + the e2e gate land in Phase 1c.
+      - run: pnpm --filter api test
       - run: pnpm --filter api build
       - run: pnpm --filter web build
