@@ -1,0 +1,71 @@
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { verify as argonVerify } from '@node-rs/argon2';
+import { ulid } from 'ulid';
+import type { Env } from '../../config/env.validation';
+import { AuthRepository } from './auth.repository';
+import { TokenService } from './token.service';
+import type { AuthTokens, ResolvedMembership } from './auth.types';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private readonly repo: AuthRepository,
+    private readonly tokens: TokenService,
+    private readonly config: ConfigService<Env, true>,
+  ) {}
+
+  async login(dto: { email: string; password: string }): Promise<AuthTokens> {
+    const user = await this.repo.findActiveUserByEmail(dto.email);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+
+    const ok = await this.verifyPassword(dto.password, user.passwordHash);
+    if (!ok) throw new UnauthorizedException('Invalid credentials');
+
+    const memberships = await this.repo.findActiveMemberships(user.id);
+    if (memberships.length === 0) throw new UnauthorizedException('Invalid credentials');
+
+    // Single membership → that one. Multiple → the first; switch-company changes it.
+    const active = memberships[0];
+    return this.issueTokens({ userId: user.id, email: user.email }, active);
+  }
+
+  /** Mints an access+refresh pair and persists a new Session for the given membership. */
+  protected async issueTokens(
+    user: { userId: string; email: string },
+    m: ResolvedMembership,
+  ): Promise<AuthTokens> {
+    const sessionId = ulid();
+    const secret = this.tokens.generateRefreshSecret();
+    const refreshTokenHash = await this.tokens.hashRefreshSecret(secret);
+    const days = this.config.get('REFRESH_TTL_DAYS', { infer: true });
+    const expiresAt = new Date(Date.now() + days * 86_400_000);
+
+    await this.repo.createSession({
+      id: sessionId,
+      userId: user.userId,
+      companyId: m.companyId,
+      refreshTokenHash,
+      expiresAt,
+    });
+
+    const accessToken = await this.tokens.signAccessToken({
+      userId: user.userId,
+      email: user.email,
+      companyId: m.companyId,
+      roleKey: m.roleKey,
+      permissions: m.permissions,
+      sessionId,
+    });
+    const refreshToken = this.tokens.buildRefreshToken(sessionId, secret);
+    return { accessToken, refreshToken };
+  }
+
+  protected async verifyPassword(plain: string, hash: string): Promise<boolean> {
+    try {
+      return await argonVerify(hash, plain);
+    } catch {
+      return false;
+    }
+  }
+}
