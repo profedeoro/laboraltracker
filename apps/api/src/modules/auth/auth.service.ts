@@ -1,11 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { verify as argonVerify } from '@node-rs/argon2';
 import { ulid } from 'ulid';
 import type { Env } from '../../config/env.validation';
 import { AuthRepository } from './auth.repository';
 import { TokenService } from './token.service';
-import type { AuthTokens, ResolvedMembership } from './auth.types';
+import type { AuthTokens, ResolvedMembership, MeResponse } from './auth.types';
 
 @Injectable()
 export class AuthService {
@@ -88,6 +93,32 @@ export class AuthService {
     // Rotate: revoke the presented session, issue a fresh pair for the SAME company.
     await this.repo.revokeSession(session.id);
     return this.issueTokens({ userId: session.userId, email: session.userEmail }, membership);
+  }
+
+  async switchCompany(userId: string, email: string, companyId: string): Promise<AuthTokens> {
+    const membership = await this.repo.findMembership(userId, companyId);
+    if (!membership) throw new ForbiddenException('No active membership in target company');
+    // The previous company's session stays valid — simultaneous multi-company allowed.
+    return this.issueTokens({ userId, email }, membership);
+  }
+
+  async me(userId: string, activeCompanyId: string): Promise<MeResponse> {
+    const user = await this.repo.findActiveUserById(userId);
+    if (!user) throw new NotFoundException('User not found');
+    const memberships = await this.repo.findActiveMemberships(userId);
+    return {
+      user,
+      activeCompanyId,
+      memberships: memberships.map((m) => ({
+        companyId: m.companyId,
+        companyName: m.companyName,
+        roleKey: m.roleKey,
+      })),
+    };
+  }
+
+  async logout(sessionId: string): Promise<void> {
+    await this.repo.revokeSession(sessionId);
   }
 
   protected async verifyPassword(plain: string, hash: string): Promise<boolean> {

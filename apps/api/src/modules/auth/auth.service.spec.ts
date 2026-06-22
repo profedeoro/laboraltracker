@@ -1,4 +1,4 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { AuthRepository } from './auth.repository';
 import type { TokenService } from './token.service';
@@ -173,5 +173,55 @@ describe('AuthService.refresh', () => {
     expect(repo.revokeSession).toHaveBeenCalledWith('s1');
     expect(repo.createSession).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ accessToken: 'access.jwt', refreshToken: 'sid.secret' });
+  });
+});
+
+describe('AuthService.switchCompany', () => {
+  it('rejects switching to a company without an active membership (403)', async () => {
+    const repo = makeRepo({ findMembership: jest.fn().mockResolvedValue(null) });
+    const svc = new AuthService(repo, makeTokens(), makeConfig());
+    await expect(svc.switchCompany('u1', 'a@a.demo', 'c-other')).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+  });
+
+  it('issues a new pair for the target company on a valid membership', async () => {
+    const repo = makeRepo({ findMembership: jest.fn().mockResolvedValue(membership) });
+    const tokens = makeTokens();
+    const svc = new AuthService(repo, tokens, makeConfig());
+    const result = await svc.switchCompany('u1', 'a@a.demo', 'c1');
+    expect(result).toEqual({ accessToken: 'access.jwt', refreshToken: 'sid.secret' });
+    expect(repo.createSession).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('AuthService.me', () => {
+  it('returns identity, active company, and memberships', async () => {
+    const repo = makeRepo({
+      findActiveUserById: jest.fn().mockResolvedValue({ id: 'u1', email: 'a@a.demo', name: 'Admin A' }),
+      findActiveMemberships: jest.fn().mockResolvedValue([membership]),
+    });
+    const svc = new AuthService(repo, makeTokens(), makeConfig());
+    const me = await svc.me('u1', 'c1');
+    expect(me.user.email).toBe('a@a.demo');
+    expect(me.activeCompanyId).toBe('c1');
+    expect(me.memberships).toEqual([
+      { companyId: 'c1', companyName: 'Empresa A', roleKey: 'COMPANY_ADMIN' },
+    ]);
+  });
+
+  it('throws 404 if the user no longer exists', async () => {
+    const repo = makeRepo({ findActiveUserById: jest.fn().mockResolvedValue(null) });
+    const svc = new AuthService(repo, makeTokens(), makeConfig());
+    await expect(svc.me('u1', 'c1')).rejects.toBeInstanceOf(NotFoundException);
+  });
+});
+
+describe('AuthService.logout', () => {
+  it('revokes the current session', async () => {
+    const repo = makeRepo();
+    const svc = new AuthService(repo, makeTokens(), makeConfig());
+    await svc.logout('s1');
+    expect(repo.revokeSession).toHaveBeenCalledWith('s1');
   });
 });
