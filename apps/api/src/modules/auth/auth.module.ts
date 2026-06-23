@@ -6,6 +6,8 @@ import { AuthService } from './auth.service';
 import { AuthRepository } from './auth.repository';
 import { TokenService } from './token.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
+import { PermissionGuard } from '../../common/guards/permission.guard';
+import { TenantGuard } from '../../common/guards/tenant.guard';
 
 @Module({
   imports: [JwtModule.register({})],
@@ -15,8 +17,10 @@ import { AuthGuard } from '../../common/guards/auth.guard';
     AuthRepository,
     TokenService,
     AuthGuard,
+    PermissionGuard,
+    TenantGuard,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
-  exports: [TokenService, AuthGuard],
+  exports: [TokenService, AuthGuard, PermissionGuard, TenantGuard, AuthRepository],
 })
 export class AuthModule {}

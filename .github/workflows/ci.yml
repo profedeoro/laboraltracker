@@ -44,6 +44,25 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.platform == 'true' }}
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: laboraltracker
+          POSTGRES_PASSWORD: laboraltracker
+          POSTGRES_DB: laboraltracker
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U laboraltracker"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://laboraltracker:laboraltracker@localhost:5432/laboraltracker?schema=public
+      JWT_SECRET: ci-only-secret-at-least-32-characters-long
+      ACCESS_TTL: "15m"
+      REFRESH_TTL_DAYS: "30"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -53,12 +72,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       # Prisma Client is a generated, non-versioned artifact: regenerate it from
-      # the schema before anything compiles against the model types (e.g. seed.ts
-      # imports RoleKey). Without this, a fresh install ships only the base stub.
+      # the schema before anything compiles against the model types.
       - run: pnpm --filter api exec prisma generate
-      # Unit suites only (mocked). The integration spec (*.repository.spec) is
-      # excluded via jest `testPathIgnorePatterns` in package.json — it needs a
-      # DB. The Postgres CI service + the e2e gate land in Phase 1c.
-      - run: pnpm --filter api test
+      - run: pnpm --filter api exec prisma migrate deploy
+      - run: pnpm --filter api exec prisma db seed
+      - run: pnpm --filter api test            # mocked unit suites
+      - run: pnpm --filter api test:integration # repository spec vs Postgres
+      - run: pnpm --filter api test:e2e         # auth flow + cross-tenant isolation
       - run: pnpm --filter api build
       - run: pnpm --filter web build
