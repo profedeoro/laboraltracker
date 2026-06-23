@@ -21,6 +21,6 @@ import { TenantGuard } from '../../common/guards/tenant.guard';
     TenantGuard,
     { provide: APP_GUARD, useClass: AuthGuard },
   ],
-  exports: [TokenService, AuthGuard, PermissionGuard, TenantGuard],
+  exports: [TokenService, AuthGuard, PermissionGuard, TenantGuard, AuthRepository],
 })
 export class AuthModule {}
