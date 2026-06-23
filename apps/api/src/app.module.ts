@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { PrismaModule } from './database/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { MembersModule } from './modules/members/members.module';
 import { validateEnv } from './config/env.validation';
 
 @Module({
@@ -10,6 +11,7 @@ import { validateEnv } from './config/env.validation';
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnv }),
     PrismaModule,
     AuthModule,
+    MembersModule,
   ],
   controllers: [AppController],
   providers: [],
