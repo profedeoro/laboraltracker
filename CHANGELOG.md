@@ -259,6 +259,26 @@
   mínimo, validación de env (Zod) al arrancar, `ValidationPipe` global y prefijo
   `/api/v1`. Tests unitarios + e2e del flujo completo.
   → `apps/api/src/modules/auth/`, `apps/api/src/common/`, `apps/api/src/config/`
+- **Phase 1c — RBAC + tenant isolation**: `PermissionGuard` (permissions-as-data,
+  reads `@RequirePermission`, checks the token's `permissions[]`, OCP — adding a
+  permission touches no controller) and `TenantGuard` (re-validates the user's
+  active `CompanyMember` in the token's `companyId`), applied per-controller after
+  the global `AuthGuard` (order Auth→Permission→Tenant). First tenant-scoped
+  endpoint `GET /members` (scoped by the token's company, never client input). The
+  **cross-tenant isolation e2e** is green: company A sees only A's members, B only
+  B's, an `EMPLOYEE` without `member.read` gets 403. CI now runs a `postgres:16`
+  service + `migrate deploy`/seed + the integration spec + the e2e — the wired
+  system is finally exercised. Closes Phase 1. /
+  **Fase 1c — RBAC + aislamiento de tenant**: `PermissionGuard` (permisos como
+  datos, lee `@RequirePermission`, verifica `permissions[]` del token, OCP) y
+  `TenantGuard` (revalida la `CompanyMember` activa en el `companyId` del token),
+  aplicados por controlador tras el `AuthGuard` global (orden Auth→Permission→
+  Tenant). Primer endpoint tenant-scoped `GET /members` (acotado por la empresa del
+  token, nunca por input del cliente). El **e2e de aislamiento entre empresas** está
+  en verde: la empresa A ve solo miembros de A, B solo de B, un `EMPLOYEE` sin
+  `member.read` recibe 403. La CI ahora levanta un servicio `postgres:16` +
+  `migrate deploy`/seed + el spec de integración + el e2e. Cierra la Fase 1.
+  → `apps/api/src/common/guards/`, `apps/api/src/modules/members/`, `apps/api/test/tenant-isolation.e2e-spec.ts`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
