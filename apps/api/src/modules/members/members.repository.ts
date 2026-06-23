@@ -9,7 +9,7 @@ export class MembersRepository {
   /** Lists the active (non-deleted) members of a single company. */
   async listByCompany(companyId: string): Promise<MemberDto[]> {
     const members = await this.prisma.companyMember.findMany({
-      where: { companyId, deletedAt: null },
+      where: { companyId, status: 'ACTIVE', deletedAt: null },
       include: {
         user: { select: { id: true, email: true, name: true } },
         role: { select: { key: true } },
