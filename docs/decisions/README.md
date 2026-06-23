@@ -45,6 +45,8 @@ normalmente se pierde entre las cabezas del equipo y el historial de git.
 | [0007](0007-sync-name-collision-policy.md) | Política de colisión de nombres en la sync | Accepted |
 | [0008](0008-observability-baseline.md) | Línea base de observabilidad de la plataforma | Accepted |
 | [0009](0009-time-naming-seam-agent-vs-platform.md) | Seam de naming: agente `TimeSession` ⇄ plataforma `TimeEntry` | Accepted |
+| [0010](0010-pin-prisma-v6.md) | Pin Prisma a v6 (diferir el modelo driver-adapter de v7) | Accepted |
+| [0011](0011-product-scope-payroll-and-productivity.md) | Scope de producto: payroll-defensible + productividad | Accepted |
 
 ## Plantilla / Template
 

@@ -77,11 +77,16 @@ plataforma arranca de cero.
 |------|---------|-------|-----------|
 | **0** | Monorepo + scaffold (api, web, contracts, CI, Postgres en Docker) | Infra | — |
 | **1** | Auth + tenancy: User/Company/CompanyMember/Role/Permission/Session, login+refresh+rotación, los 4 guards, seed RBAC | Plataforma | 0 |
-| **2** | CRUD de dominio: companies, members, teams, projects, tasks (multi-tenant + RBAC) | Plataforma | 1 |
+| **2** | CRUD de dominio: companies, members, teams, projects, tasks (multi-tenant + RBAC) **+ `AuditLog` (escritura) en cada mutación sensible** | Plataforma | 1 |
 | **3** | **Sync**: Device + autorización, SyncBatch, `POST /sync/time-entries` idempotente; cliente de sync en el agente | **Ambas** | 1, 2 + agente |
 | **4** | Reportes: horas por usuario/proyecto/tarea (excluye `isSuspect`) + dashboard básico | Plataforma | 2, 3 |
 | **5** | Captura: actividad + screenshots en el agente, bucket + URLs firmadas, política `CompanyTrackingSettings` + blur + job de retención | **Ambas** | 3 |
 | **6** | Avanzado: notificaciones, facturación, UI de auditoría, exports | Plataforma | 4, 5 |
+| **7** | **Payroll workflow**: edición manual de tiempo (auditada), aprobación de manager, políticas de pausas/horas extra, rates por empleado, export de timesheet | Plataforma | 4 |
+
+> **Scope = ambos** (ADR 0011): LaboralTracker apunta a ser **payroll-defensible
+> Y** herramienta de productividad. Eso agrega la **Fase 7** y, sobre todo, instala
+> un **hilo de defensibilidad** que cruza el roadmap (ver nota abajo).
 
 ### Qué hace especial a cada fase
 
@@ -95,6 +100,31 @@ plataforma arranca de cero.
 - **Fase 5 es la más sensible (privacidad).** Captura de pantalla/actividad: se
   construye **después** de tener auth, tenancy y sync sólidos, y respetando el doc 03
   (capturas off por defecto, blur, retención, transparencia).
+
+> **Hilo de defensibilidad (ADR 0011).** Como el producto debe ser
+> *payroll-defensible*, la **integridad y la auditoría se diseñan antes de que existan
+> los datos**, no se atornillan al final: lo que no se audita/protege al ocurrir queda
+> **indefendible para siempre**. Un review fase por fase fijó los aterrizajes:
+> - **`AuditLog` (escritura) → Fase 2**, no Fase 6. La Fase 2 trae las **primeras
+>   mutaciones auditables** (asignar rol, suspender member, borrar proyecto/tarea):
+>   CRUD sin trazas las deja sin auditar para siempre. El modelo (doc 01) y la lista
+>   de acciones sensibles (doc 02 §6) ya existen; solo el faseado estaba mal. La **UI**
+>   de auditoría se queda en Fase 6.
+> - **Integridad del agente → Fase 3** (P1 del backlog de hardening): detección de
+>   **salto de reloj hacia adelante** (hoy solo se atrapa el retroceso y el cap de
+>   12 h), **log de eventos tamper-evident** (start/stop/crash/cambio-de-reloj) e
+>   **integridad de la BD local** (checksum/firma). La plataforma **persiste el
+>   veredicto del agente, no lo recalcula**. A especificar **antes** del cliente de sync.
+> - **`TimeEntry` nace audit-aware → Fase 3.** Una **edición manual** de tiempo
+>   capturado por el agente (la acción más abusable de payroll) debe preservar valor
+>   original + quién + cuándo + por qué. El seam se respeta al construir `TimeEntry`,
+>   aunque payroll sea Fase 7 — o si no Fase 3/4 shippean una entrada mutable cuyo
+>   historial la Fase 7 no puede reconstruir.
+>
+> **Cimiento ya shippeado (Fase 1):** sano (soft-delete + aislamiento por tenant). Dos
+> huecos menores vs. el modelo diseñado, a cerrar al tocar esas tablas en Fase 2, sin
+> migración urgente: `Session` sin `ip`/`userAgent` (forense) y `CompanyMember` sin
+> `updatedAt` (cuándo cambió el rol/estado).
 
 ---
 

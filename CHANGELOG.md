@@ -279,6 +279,24 @@
   `member.read` recibe 403. La CI ahora levanta un servicio `postgres:16` +
   `migrate deploy`/seed + el spec de integración + el e2e. Cierra la Fase 1.
   → `apps/api/src/common/guards/`, `apps/api/src/modules/members/`, `apps/api/test/tenant-isolation.e2e-spec.ts`
+- **ADR 0011** (Accepted): product scope = **payroll-defensible AND productivity**.
+  A gap analysis was verified against the repo (activity monitoring is designed not
+  missing; sync is designed not coded; payroll workflow was genuinely undesigned;
+  anti-tamper has real holes — no forward-clock-jump detection, no local-DB
+  integrity, no agent event log). The scope choice pulls `AuditLog` + agent integrity
+  **forward to be designed with Sync (Phase 3)** — integrity is a foundation
+  property, not retrofittable onto data that already exists — and adds **Phase 7
+  (payroll workflow)** to the roadmap. Build order unchanged. /
+  **ADR 0011** (Aceptado): scope de producto = **payroll-defensible Y productividad**.
+  Un análisis de gaps se verificó contra el repo (el monitoreo de actividad está
+  diseñado, no ausente; la sync está diseñada, no codeada; el workflow de payroll
+  estaba genuinamente sin diseñar; el anti-tamper tiene huecos reales — sin detección
+  de salto de reloj hacia adelante, sin integridad de la BD local, sin log de eventos
+  del agente). El scope adelanta `AuditLog` + integridad del agente **a diseñarse con
+  la Sync (Fase 3)** — la integridad es propiedad de los cimientos, no se retrofitea
+  sobre datos que ya existen — y agrega la **Fase 7 (payroll workflow)** al roadmap.
+  El orden de build no cambia.
+  → `docs/decisions/0011-product-scope-payroll-and-productivity.md`, `docs/saas/06-roadmap.md`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
