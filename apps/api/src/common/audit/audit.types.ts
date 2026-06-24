@@ -1,5 +1,7 @@
+import { AuditAction } from './audit-actions';
+
 export interface AuditEntry {
-  action: string;
+  action: AuditAction;
   companyId: string | null;
   actorUserId: string | null;
   entityType?: string;
