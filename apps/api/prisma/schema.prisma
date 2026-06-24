@@ -19,9 +19,10 @@ model Company {
   updatedAt DateTime      @updatedAt @db.Timestamptz(3)
   deletedAt DateTime?     @db.Timestamptz(3)
 
-  members  CompanyMember[]
-  teams    Team[]
-  sessions Session[]
+  members   CompanyMember[]
+  teams     Team[]
+  sessions  Session[]
+  auditLogs AuditLog[]
 }
 
 // ──────────────────── IDENTIDAD / MEMBRESÍA ────────────────────
@@ -137,6 +138,25 @@ model Session {
 
   @@index([userId, companyId])
   @@index([expiresAt])
+}
+
+// ────────────────────────────── AUDIT ──────────────────────────────
+
+/// Registro INMUTABLE de acciones sensibles (solo append: sin update/delete desde la app).
+model AuditLog {
+  id          String   @id // ULID provisto por el servicio
+  companyId   String?
+  actorUserId String?
+  action      String // p. ej. "member.role_changed"
+  entityType  String?
+  entityId    String?
+  metadata    Json     @default("{}") // { before, after } en cambios sensibles
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([companyId, createdAt])
+  @@index([actorUserId])
 }
 
 // ────────────────────────────── ENUMS ──────────────────────────────

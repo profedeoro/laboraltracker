@@ -297,6 +297,19 @@
   sobre datos que ya existen — y agrega la **Fase 7 (payroll workflow)** al roadmap.
   El orden de build no cambia.
   → `docs/decisions/0011-product-scope-payroll-and-productivity.md`, `docs/saas/06-roadmap.md`
+- **Phase 2a — audit infrastructure**: immutable `AuditLog` model + migration; an
+  atomic `AuditService.record(entry, tx)` (+ `AuditRepository`) that writes inside the
+  caller's transaction so audit and mutation commit/rollback together — no interceptor
+  (it cannot join Prisma's active tx); and a global `AllExceptionsFilter` mapping Prisma
+  errors (`P2002→409`, `P2025→404`) to the standard error shape, so a forgotten `catch`
+  never leaks a raw 500. The substrate every later Phase-2 mutation audits to. /
+  **Fase 2a — infraestructura de auditoría**: modelo inmutable `AuditLog` + migración;
+  un `AuditService.record(entry, tx)` atómico (+ `AuditRepository`) que escribe dentro
+  de la transacción del llamador (auditoría y mutación commitean/rollbackean juntas) —
+  sin interceptor (no puede unirse a la tx activa de Prisma); y un `AllExceptionsFilter`
+  global que mapea errores de Prisma (`P2002→409`, `P2025→404`) a la forma estándar,
+  para que un `catch` olvidado nunca filtre un 500 crudo.
+  → `apps/api/src/common/audit/`, `apps/api/src/common/filters/`, `apps/api/prisma/migrations/`
 
 ### 🇬🇧 Changed / 🇪🇸 Cambiado
 - **Spec foundations hardened** after technical review: UTC epoch-millis time
